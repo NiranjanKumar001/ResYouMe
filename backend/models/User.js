@@ -5,7 +5,6 @@ const userSchema = new Schema(
   {
     githubId: {
       type: String,
-      required: true,
       unique: true,
       index: true
     },
