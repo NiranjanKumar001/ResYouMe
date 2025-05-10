@@ -85,7 +85,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight max-w-4xl mx-auto"
+            className="text-5xl md:text-5xl lg:text-6xl font-bold text-gray-800 leading-tight max-w-4xl mx-auto"
           >
             Affordable, Accessible and Efficient
             <br />
@@ -97,7 +97,7 @@ const Hero = () => {
             Transform your resume into a stunning portfolio in just three simple steps
           </p>
           
-          <div className="relative z-20 mt-8 flex text-center justify-center"> 
+          <div className="relative z-20 mt-12 flex text-center justify-center "> 
               <button className="flex items-center justify-center gap-2 bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg shadow-xl hover:bg-blue-50 hover:shadow-2xl transition-all duration-300 group animate-float"> 
                 <span className="text-lg">Get Started</span>
                 <svg
