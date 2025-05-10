@@ -2,8 +2,22 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
+import {useEffect} from 'react';
 
 function App() {
+
+  const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
+  
+  // useEffect (()=>{
+  //   const queryString=window.location.search;
+  //   const urlParams = new URLSearchParams(queryString);
+  //   const codeParams = urlParams.get("code");
+  //   console.log(codeParams);
+  // },[]);
+
+  const githubLogin = () => {
+    window.location.href = "http://localhost:3000/auth/github";
+   };
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* Grid background at the top of the page */}
@@ -16,11 +30,11 @@ function App() {
           </div>
         </div>
       </div>
-
-      <Navbar className/>
+      <Navbar />
       <main className="flex-grow relative z-10">
         <Hero />
       </main>
+      <button onClick={githubLogin}>Login with GitHub</button>
       <Footer />
     </div>
   );

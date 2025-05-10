@@ -1,22 +1,10 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const axios = require('axios');
 const cors = require('cors');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
-const path = require('path');
-
-// Import route and middleware files
-const authRoutes = require('./routes/authRoutes');
-const apiRoutes = require('./routes/apiRoutes');
-const { authenticate } = require('./middleware/authMiddleware');
-const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-
-// Initialize Express app
+const mongoose = require('mongoose');
 const app = express();
+app.use(cors());
 
 // Database connection with enhanced options
 mongoose.connect(process.env.MONGODB_URI, {
@@ -27,29 +15,12 @@ mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000
 })
-.then(() => console.log('✅ MongoDB connected successfully'))
+.then(() => console.log('MongoDB connected successfully'))
 .catch(err => {
-  console.error('❌ MongoDB connection error:', err);
+  console.error('MongoDB connection error:', err);
   process.exit(1);
 });
 
-// Security Middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "cdn.example.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      imgSrc: ["'self'", "data:", "*.githubusercontent.com"],
-      connectSrc: ["'self'", "api.github.com"]
-    }
-  },
-  hsts: {
-    maxAge: 63072000, // 2 years in seconds
-    includeSubDomains: true,
-    preload: true
-  }
-}));
 
 // CORS Configuration
 app.use(cors({
@@ -59,60 +30,112 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Essential Middleware
-app.use(cookieParser());
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'combined'));
+// const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+// const CLIENT_SECRET=process.env.GITHUB_CLIENT_SECRET;
+// app.get('/auth/github',(req,res)=>{
+//     res.redirect(`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`)
+// });
 
-// Session Configuration with enhanced security
-app.use(session({
-  name: 'sessionId',
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    collectionName: 'sessions',
-    ttl: 7 * 24 * 60 * 60, // 7 days in seconds
-    autoRemove: 'interval',
-    autoRemoveInterval: 60 // Minutes
-  }),
-  cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
-    domain: process.env.COOKIE_DOMAIN || undefined
+// app.get ('/auth/github/callback', async (req, res) => {
+//     const { code } = req.query;
+//     console.log(code);
+
+// const tokenRes = await axios.post(
+//     `https://github.com/login/oauth/access_token`,
+//     {
+//     client_id: CLIENT_ID,
+//     client_secret: CLIENT_SECRET,
+//     code,
+//     },
+//     {
+//     headers: {
+//     accept: 'application/json',
+//     }
+// });
+
+// console.log()
+
+// const access_token = tokenRes.data.access_token;
+//  const userRes = await axios.get(`https://api.github.com/user`, {
+//  headers: {
+//  Authorization: `token ${access_token}`,
+//  },
+//  });
+//  res.json(userRes.data);
+//  console.log(res.json(userRes.data));
+// });
+
+
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const CALLBACK_URL = process.env.GITHUB_CALLBACK_URL;
+
+// Simple GitHub OAuth endpoint
+app.get('/auth/github', (req, res) => {
+  const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${CALLBACK_URL}`;
+  res.redirect(redirectUrl);
+});
+
+// Callback endpoint - simplified
+app.get('/auth/github/callback', async (req, res) => {
+  try {
+    const { code } = req.query;
+    
+    console.log(code)
+    // 1. Exchange code for access token
+    const tokenResponse = await axios.post(
+      'https://github.com/login/oauth/access_token',
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        code,
+        redirect_uri: CALLBACK_URL
+      },
+      {
+        headers: { Accept: 'application/json' }
+      }
+    );
+
+    const { access_token } = tokenResponse.data;
+
+    console.log(access)
+    // 2. Get user profile
+    const userResponse = await axios.get('https://api.github.com/user', {
+      headers: { Authorization: `token ${access_token}` }
+    });
+
+    // 3. Get user emails
+    const emailsResponse = await axios.get('https://api.github.com/user/emails', {
+      headers: { Authorization: `token ${access_token}` }
+    });
+
+    const primaryEmail = emailsResponse.data.find(email => email.primary)?.email;
+
+    // 4. Prepare response data
+    const userData = {
+      id: userResponse.data.id,
+      login: userResponse.data.login,
+      name: userResponse.data.name,
+      email: primaryEmail,
+      avatar_url: userResponse.data.avatar_url,
+      html_url: userResponse.data.html_url
+    };
+
+    // 5. Log to console and return response
+    console.log('GitHub User Data:', userData);
+    res.json(userData);
+
+  } catch (error) {
+    console.error('OAuth Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Authentication failed' });
   }
-}));
+});
 
-// API Routes (protected with authentication)
-app.use('/api', authenticate, apiRoutes);
-
-// Auth Routes (public)
-app.use('/auth', authRoutes);
-
-// Error Handling Middleware (must be last)
-app.use(notFound);
-app.use(errorHandler);
-
-// Server startup with graceful shutdown
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  server.close(() => process.exit(1));
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully');
-  server.close(() => {
-    console.log('Process terminated');
-  });
-});
+// GITHUB_CLIENT_ID=Ov23ligzzzIRhA8wRtD2
+// GITHUB_CLIENT_SECRET=3640bfacba2f8e4f619d1542dd5e6faea620f67d
+// GITHUB_CALLBACK_URL=https://localhost:5000/auth/github/callback
