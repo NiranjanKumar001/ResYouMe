@@ -59,7 +59,8 @@ exports.handleGithubCallback = async (req, res) => {
     const primaryEmail = emailsResponse.data.find(email => email.primary)?.email;
 
     // 4. Create or update user
-    const userData = {
+    
+    const userData =  {
       githubId: profileResponse.data.id.toString(),
       githubAccessToken,
       profile: {
