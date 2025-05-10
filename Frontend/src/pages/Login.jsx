@@ -1,9 +1,13 @@
 import React from 'react'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 function Login() {
   return (
-    <div>Login</div>
+    <div>
+        <Navbar/>
+        <Footer/>
+    </div>
   )
 }
-
 export default Login
