@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import AuthContext from '../context/AuthContext';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -12,6 +12,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+  const {setProtect} =useContext(AuthContext)
 
   // Check authentication status on component mount
   useEffect(() => {
@@ -23,6 +24,7 @@ const Navbar = () => {
         });
         if (res.data.isAuthenticated) {
           setUser(res.data.user);
+          setProtect(true);
         }
       } catch (error) {
         console.log('Not authenticated');
@@ -61,6 +63,7 @@ const Navbar = () => {
         withCredentials: true
       });
       setUser(null);
+      setProtect(false);
       navigate('/');
       
     } catch (error) {
