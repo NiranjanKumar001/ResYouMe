@@ -8,7 +8,7 @@ const Footer = () => {
     link.rel = 'stylesheet';
     link.href = 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Chakra+Petch:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap';
     document.head.appendChild(link);
-    
+
     return () => {
       document.head.removeChild(link);
     };
@@ -16,7 +16,7 @@ const Footer = () => {
 
   return (
     <footer className="relative py-16 overflow-hidden bg-slate-950 border-t border-gray-800" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-      {/* Radial gradient background */}
+
       <div className="absolute inset-0 h-full w-full overflow-hidden">
         <div className="absolute bottom-0 left-[-15%] top-[-15%] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(217,70,239,0.25),rgba(255,255,255,0))] animate-pulse-slow"></div>
         <div className="absolute bottom-0 right-[-15%] top-[-15%] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(99,102,241,0.3),rgba(255,255,255,0))] animate-pulse-slow-delay"></div>

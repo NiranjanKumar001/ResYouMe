@@ -1,28 +1,34 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
+import Templates from './pages/Templates';
+import Insights from './pages/Insight';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Dashboard from './pages/Dashboard';
 
 function App() {
-  return (
-    <div className="min-h-screen flex flex-col relative">
-      {/* Grid background at the top of the page */}
-      <div className="absolute inset-0 h-[50vh] pointer-events-none">
-        <div className="relative h-full w-full bg-white">
-          <div className="absolute bottom-0 left-0 right-0 top-0 
-            bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] 
-            bg-[size:14px_24px] 
-            [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]">
-          </div>
-        </div>
-      </div>
 
-      <Navbar className/>
-      <main className="flex-grow relative z-10">
-        <Hero />
-      </main>
-      <Footer />
-    </div>
+  return (
+    <Router>
+      <div className="min-h-screen flex flex-col relative">
+        <Navbar />
+        <main className="flex-grow relative z-10">
+          <Routes>
+            <Route path="/" element={<Hero/>} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </main>
+        <Footer />
+
+      </div>
+    </Router>
   );
 }
 
