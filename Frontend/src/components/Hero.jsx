@@ -65,7 +65,7 @@ const Hero = () => {
       {/* Hero Section */}
       <section className="relative overflow-hidden h-screen flex items-center">
         {/* Grid background at bottom */}
-        <div className="absolute inset-0 h-full w-full">
+        <div className="absolute inset-0 h-full w-full z-[-1]">
           <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:linear-gradient(to_bottom,transparent_10%,#000_40%)]"></div>
         </div>
 
@@ -80,7 +80,18 @@ const Hero = () => {
           <div className="absolute left-[70%] bottom-10 w-[250px] h-[250px] bg-purple-500/20 rounded-full filter blur-[80px]"></div>
         </div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
+        {/* Grid background at the top of the page */}
+        <div className="absolute inset-0 h-[50vh] pointer-events-none z-[-1]">
+          <div className="relative h-full w-full bg-white">
+            <div className="absolute bottom-0 left-0 right-0 top-0 
+              bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] 
+              bg-[size:14px_24px] 
+              [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]">
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-4 text-center relative z-10 mt-[4rem]">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -89,7 +100,7 @@ const Hero = () => {
           >
             Affordable, Accessible and Efficient
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+            <span className="bg-clip-text font-semibold text-5xl text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
               AI Compute for Everyone
             </span>
           </motion.h1>
@@ -148,9 +159,7 @@ const Hero = () => {
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Transform your resume into a stunning portfolio in just three simple steps
-            </p>
-
-            
+            </p>            
 
           </motion.div>
 
