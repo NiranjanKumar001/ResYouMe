@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,9 +18,22 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
+  useEffect(() => {
+    // Close mobile menu when route changes
+    setMobileMenuOpen(false);
+  }, [location]);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
+  // Navigation items array
+  const navItems = [
+    { to: '/templates', label: 'Templates' },
+    { to: '/insights', label: 'Insights' },
+    { to: '/about', label: 'About' },
+    { to: '/contact', label: 'Contact' }
+  ];
 
   return (
     <>
@@ -69,11 +84,10 @@ const Navbar = () => {
               fontFamily: "'Space Grotesk', sans-serif",
             }}
           >
-            {/* Logo with improved gradient */}
             <div className="flex items-center group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
               
-              <span className="text-white font-medium text-xl tracking-tight relative z-10">
+              <Link to="/" className="text-white font-medium text-xl tracking-tight relative z-10">
                 <span 
                   className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
                   style={{
@@ -83,10 +97,9 @@ const Navbar = () => {
                 >
                   Despicable Me
                 </span>
-              </span>
+              </Link>
             </div>
 
-            {/* Hamburger menu for mobile */}
             <button 
               className="md:hidden p-2 rounded-full focus:outline-none"
               onClick={toggleMobileMenu}
@@ -100,22 +113,19 @@ const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
-              {[
-                { href: '#templates', label: 'Templates' },
-                { href: '#insights', label: 'Insights' },
-                { href: '#about', label: 'About' },
-                { href: '#contact', label: 'Contact' }
-              ].map((item) => (
-                <div key={item.href} className="group relative">
+              {navItems.map((item) => (
+                <div key={item.to} className="group relative">
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-500/30 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
-                  <a
-                    href={item.href}
-                    className="relative text-gray-300 hover:text-white transition-all duration-300 px-3 py-0.5"
+                  <Link
+                    to={item.to}
+                    className={`relative text-gray-300 hover:text-white transition-all duration-300 px-3 py-0.5 ${
+                      location.pathname === item.to ? 'text-white font-medium' : ''
+                    }`}
                   >
                     <span className="font-normal tracking-wide relative z-10">
                       {item.label}
                     </span>
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -134,22 +144,18 @@ const Navbar = () => {
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''} md:hidden`}>
           <div className="bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-2xl mx-4 mt-2 p-6 shadow-xl border border-gray-700/60">
             <div className="flex flex-col space-y-4 ">
-              {[
-                { href: '#templates', label: 'Templates' },
-                { href: '#insights', label: 'Insights' },
-                { href: '#about', label: 'About' },
-                { href: '#contact', label: 'Contact' }
-              ].map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="text-gray-300 hover:text-white transition-all duration-300 py-2 px-4 rounded-lg hover:bg-gray-900"
-                  onClick={() => setMobileMenuOpen(false)}
+              {navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`text-gray-300 hover:text-white transition-all duration-300 py-2 px-4 rounded-lg hover:bg-gray-900 ${
+                    location.pathname === item.to ? 'bg-gray-800 text-white' : ''
+                  }`}
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
-              <button className="w-full mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg border border-gray-600/50">
+              <button className="w-full mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg border border-gray-600/50" >
                 Get Started
               </button>
             </div>
