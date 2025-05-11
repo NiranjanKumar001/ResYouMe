@@ -88,7 +88,7 @@ const Footer = () => {
           <div className="flex items-center mb-4 md:mb-0">
             <Heart className="h-4 w-4 text-red-400 fill-red-400/20 mr-2" />
             <span className="text-sm text-gray-400 tracking-tight" style={{ fontFamily: "'DM Mono', monospace" }}>
-              Crafted with passion by Musafir Team
+              Crafted with passion by Team Musafir 
             </span>
           </div>
           

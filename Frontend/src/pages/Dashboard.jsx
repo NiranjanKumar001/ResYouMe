@@ -19,7 +19,7 @@ function Dashboard() {
   const steps = [
     { id: 1, title: 'Upload Resume', description: 'Upload your PDF or DOCX resume' },
     { id: 2, title: 'Review & Edit', description: 'Review and edit your information' },
-    { id: 3, title: 'Payment', description: 'Complete payment to continue' },
+    { id: 3, title: 'Payment & Auth', description: 'Complete payment to continue' },
     { id: 4, title: 'Generate Portfolio', description: 'AI generates your portfolio' }
   ];
 

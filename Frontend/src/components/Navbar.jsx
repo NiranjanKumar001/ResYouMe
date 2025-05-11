@@ -62,6 +62,7 @@ const Navbar = () => {
       });
       setUser(null);
       navigate('/');
+      
     } catch (error) {
       console.error('Logout failed', error);
     }
