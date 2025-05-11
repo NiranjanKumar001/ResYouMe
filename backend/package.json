@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "User.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "app": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.2",
-    "morgan": "^1.10.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10"
   }
 }

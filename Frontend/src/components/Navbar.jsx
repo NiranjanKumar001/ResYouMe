@@ -1,10 +1,38 @@
+/* eslint-disable no-unused-vars */
+ 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        // Using Vite environment variable format
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
+          withCredentials: true
+        });
+        if (res.data.isAuthenticated) {
+          setUser(res.data.user);
+        }
+      } catch (error) {
+        console.log('Not authenticated');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +53,23 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {}, {
+        withCredentials: true
+      });
+      setUser(null);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
+  const githubLogin = () => {
+    // Using Vite environment variable format
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
   };
 
   // Navigation items array
@@ -133,9 +178,45 @@ const Navbar = () => {
             {/* CTA button with enhanced gradient - hidden on mobile */}
             <div className="hidden md:block group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
-              <button className="relative px-4 py-1 rounded-full bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium text-sm tracking-wide hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 shadow-lg z-10 border border-gray-600/50">
-                Get Started
-              </button>
+              
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <Link 
+                    to="/dashboard" 
+                    className="relative px-4 py-1 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg z-10 border border-gray-600/50"
+                  >
+                    Dashboard
+                  </Link>
+                  
+                  <div className="relative group">
+                    <img 
+                      src={user.avatar} 
+                      alt={user.name} 
+                      className="w-8 h-8 rounded-full cursor-pointer border-2 border-gray-700 hover:border-blue-400 transition-all duration-300"
+                    />
+                    
+                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-2 z-20 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 border border-gray-700">
+                      <div className="px-4 py-2 border-b border-gray-700">
+                        <p className="text-sm font-medium text-white">{user.name}</p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={githubLogin}
+                  className="relative px-4 py-1 rounded-full bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium text-sm tracking-wide hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 shadow-lg z-10 border border-gray-600/50"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -143,7 +224,21 @@ const Navbar = () => {
         {/* Mobile Menu */}
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''} md:hidden`}>
           <div className="bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-2xl mx-4 mt-2 p-6 shadow-xl border border-gray-700/60">
-            <div className="flex flex-col space-y-4 ">
+            <div className="flex flex-col space-y-4">
+              {user && (
+                <div className="flex items-center space-x-3 px-4 py-3 border-b border-gray-700 mb-2">
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name} 
+                    className="w-10 h-10 rounded-full border-2 border-gray-700"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-white">{user.name}</p>
+                    <p className="text-xs text-gray-400">{user.email}</p>
+                  </div>
+                </div>
+              )}
+              
               {navItems.map((item) => (
                 <Link
                   key={item.to}
@@ -155,9 +250,30 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              <button className="w-full mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg border border-gray-600/50" >
-                Get Started
-              </button>
+              
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="text-gray-300 hover:text-white transition-all duration-300 py-2 px-4 rounded-lg hover:bg-gray-900"
+                  >
+                    Dashboard
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="text-left text-gray-300 hover:text-white transition-all duration-300 py-2 px-4 rounded-lg hover:bg-gray-900"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <button 
+                  onClick={githubLogin}
+                  className="w-full mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg border border-gray-600/50 text-center"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
           </div>
         </div>
