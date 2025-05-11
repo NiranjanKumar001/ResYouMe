@@ -176,8 +176,6 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 
-
-// Protected route example
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
