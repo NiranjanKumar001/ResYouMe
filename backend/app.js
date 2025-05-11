@@ -51,6 +51,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //   res.redirect(githubAuthUrl);
 // });
 
+app.use('/api/resumes', resumeRoutes)
 
 // GitHub OAuth login endpoint
 app.get('/auth/github', (req, res) => {
