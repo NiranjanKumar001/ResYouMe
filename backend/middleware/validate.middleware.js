@@ -1,4 +1,4 @@
-//USED FOR VALIDATING THE INPUT GIVEN BY USER TO THE SCHEMA THAT WE MADE
+//USED FOR VALIDATING THE INPUT GIVEN BY USER TO THE SCHEMA THAT WE MADE THIS IS A FUNCTION
 const validate = (schema) => async (req, res, next) => {
   try {
     await schema.parseAsync({

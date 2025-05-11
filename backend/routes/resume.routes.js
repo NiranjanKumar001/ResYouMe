@@ -1,11 +1,11 @@
 // src/routes/resume.routes.js
 const express = require('express');
 const router = express.Router();
-const resumeController = require('../controllers/resumeController');
+const resumeController = require('../controller/resumeController');
 const uploadMiddleware = require('../middleware/upload.middleware');
 const { validate } = require('../middleware/validate.middleware');
 const resumeValidator  = require('../validators/resume.validator');
-const authMiddleware = require('../middleware/fakeAuthMiddleware');
+const authMiddleware = require('../middleware/fakeAuthMiddleware'); //CHANGE THIS WITH THE REAL ONE
 
 // Apply auth middleware to all resume routes
 router.use(authMiddleware);
