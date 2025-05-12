@@ -44,14 +44,7 @@ const REDIRECT_URI = process.env.GITHUB_CALLBACK_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 
-// const REDIRECT_URI = 'http://localhost:5000/auth/github/callback';
-
-// app.get('/auth/github', (req, res) => {
-//   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
-//   res.redirect(githubAuthUrl);
-// });
-
-app.use('/api/resumes', resumeRoutes)
+// app.use('/api/resumes', resumeRoutes) for check remove ater use
 
 // GitHub OAuth login endpoint
 app.get('/auth/github', (req, res) => {
@@ -168,6 +161,7 @@ app.get('/api/auth/status', authenticateToken, (req, res) => {
     } 
   });
 });
+
 
 // Logout endpoint
 app.post('/api/auth/logout', (req, res) => {
