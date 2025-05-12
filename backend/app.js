@@ -6,13 +6,16 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const User = require('./models/User'); // We'll create this model
-const { authenticateToken } = require('./middleware/auth'); // We'll create this middleware
+const { authenticateToken } = require('./middleware/auth.js'); // We'll create this middleware
+const resumeRoutes= require('./routes/resumeRoutes.js')
+const bodyParser = require('body-parser')
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
 
 // CORS Configuration with secure settings
 app.use(cors({
@@ -43,9 +46,6 @@ const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GITHUB_CALLBACK_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-
-// app.use('/api/resumes', resumeRoutes) for check remove ater use
-
 // GitHub OAuth login endpoint
 app.get('/auth/github', (req, res) => {
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
@@ -74,18 +74,18 @@ app.get('/auth/github/callback', async (req, res) => {
         headers: { Accept: 'application/json' }
       }
     );
-
+    
     const { access_token } = tokenResponse.data;
     
     if (!access_token) {
       return res.status(400).redirect(`${process.env.FRONTEND_URL}/login?error=token_failed`);
     }
-
+    
     // 2. Get user profile
     const userResponse = await axios.get('https://api.github.com/user', {
       headers: { Authorization: `token ${access_token}` }
     });
-
+    
     // 3. Get user emails
     const emailsResponse = await axios.get('https://api.github.com/user/emails', {
       headers: { Authorization: `token ${access_token}` }
@@ -96,7 +96,7 @@ app.get('/auth/github/callback', async (req, res) => {
     if (!primaryEmail) {
       return res.status(400).redirect(`${process.env.FRONTEND_URL}/login?error=email_required`);
     }
-
+    
     // 4. Find or create user in database
     let user = await User.findOne({ githubId: userResponse.data.id });
     
@@ -120,7 +120,7 @@ app.get('/auth/github/callback', async (req, res) => {
       user.accessToken = access_token;
       await user.save();
     }
-
+    
     // 5. Generate JWT token
     const token = jwt.sign(
       { 
@@ -131,7 +131,7 @@ app.get('/auth/github/callback', async (req, res) => {
       JWT_SECRET, 
       { expiresIn: '7d' }
     );
-
+    
     // 6. Set secure HTTP-only cookie with the token
     res.cookie('auth_token', token, {
       httpOnly: true,
@@ -139,7 +139,7 @@ app.get('/auth/github/callback', async (req, res) => {
       sameSite: 'lax', // Helps prevent CSRF
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
-
+    
     // 7. Redirect to dashboard
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     
@@ -170,6 +170,7 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 
+app.use('/api/resumes', resumeRoutes)
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
