@@ -162,6 +162,7 @@ app.get('/api/auth/status', authenticateToken, (req, res) => {
   });
 });
 
+
 // Logout endpoint
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('auth_token');
