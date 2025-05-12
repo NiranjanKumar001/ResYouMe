@@ -6,19 +6,16 @@ const Resume = require("../models/resume");
 const User = require("../models/User");
 const logger = require("../utils/logger");
 require('dotenv').config();
+const axios = require('axios');
 
+// Helper to extract structured data from raw text using Groq
+async function parseWithGroq(text) {
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-// console.log("API Key value:", process.env.GEMINI_API_KEY);
-// Check if it's undefined or doesn't match your expected key
+  const API_KEY = process.env.GROQ_API_KEY;
+  //console.log(API_KEY);
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// Helper to extract structured data from raw text using Gemini
-async function parseWithGemini(text) {
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-  const prompt = `
-You're a resume parser. Extract the following from the resume text:
+  const prompt =
+   `You're a resume parser. Extract the following from the resume text:
 
 - Name
 - Email
@@ -40,18 +37,39 @@ Respond in strict JSON format like:
 }
 
 Resume Text:
-${text}
-  `;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const jsonString = response.text().replace(/```json|```/g, "").trim();
+${text}`;
 
   try {
-    return JSON.parse(jsonString);
+    const response = await axios.post(
+  'https://api.groq.com/openai/v1/chat/completions',
+  {
+    model: "llama-3.3-70b-versatile", // Change to a supported model
+    messages: [{ role: 'user', content: prompt }],
+    response_format: { type: "json_object" },
+    temperature: 0.1
+  },
+  {
+    headers: {
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  }
+);
+
+
+    const content = response.data.choices[0]?.message?.content;
+    if (typeof content === 'string') {
+      // Sometimes the response comes as a string with JSON inside
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      return JSON.parse(content);
+    }
+    return content;
   } catch (err) {
-    logger.error("Error parsing JSON from Gemini response", err);
-    return {};
+    logger.error("Error parsing with Groq", err);
+    throw new Error("Failed to parse resume with Groq API");
   }
 }
 
@@ -67,7 +85,7 @@ exports.uploadResume = async (req, res) => {
     const buffer = await fs.readFile(filepath);
     const { text } = await pdf(buffer); // Extract raw text from PDF
 
-    const resumeData = await parseWithGemini(text);
+    const resumeData = await parseWithGroq(text);
 
     const resume = new Resume({
       user: req.user.id || "6579e2a1b54d7e3a5c8b4567", // fallback for testing remove this NIRUUUUU
@@ -97,7 +115,10 @@ exports.uploadResume = async (req, res) => {
 
   } catch (error) {
     logger.error("RESUME UPLOAD ERROR", error);
-    return res.status(500).json({ message: "Error uploading resume" });
+    return res.status(500).json({ 
+      message: "Error uploading resume",
+      error: error.message 
+    });
   }
 };
 
@@ -175,7 +196,7 @@ exports.reparseResume = async (req, res) => {
 
     const buffer = await fs.readFile(resume.path);
     const { text } = await pdf(buffer);
-    const resumeData = await parseWithGemini(text);
+    const resumeData = await parseWithGroq(text);
 
     resume.parsedData = {
       ...resumeData,
@@ -195,7 +216,10 @@ exports.reparseResume = async (req, res) => {
 
   } catch (error) {
     logger.error("REPARSE RESUME ERROR", error);
-    return res.status(500).json({ message: "Error reparsing resume" });
+    return res.status(500).json({ 
+      message: "Error reparsing resume",
+      error: error.message 
+    });
   }
 };
 
