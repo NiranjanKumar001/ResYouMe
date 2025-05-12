@@ -1,0 +1,37 @@
+@import "tailwindcss";
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+/* Custom styles can be added here */
+body {
+  font-family: "PP Neue Montreal", sans-serif;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+@keyframes pulse-slow-delay {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.9; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+.animate-pulse-slow-delay {
+  animation: pulse-slow-delay 10s ease-in-out infinite 2s;
+}
+
+/* For modern browsers (Chrome, Edge, Safari, Opera) */
+::selection {
+  background: #8aff8a; /* Light green background */
+  color: #000; /* Black text for better contrast */
+}
+
+/* For Firefox */
+::-moz-selection {
+  background: #8aff8a;
+  color: #000;
+}
