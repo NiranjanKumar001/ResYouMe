@@ -23,3 +23,15 @@ body {
 .animate-pulse-slow-delay {
   animation: pulse-slow-delay 10s ease-in-out infinite 2s;
 }
+
+/* For modern browsers (Chrome, Edge, Safari, Opera) */
+::selection {
+  background: #8aff8a; /* Light green background */
+  color: #000; /* Black text for better contrast */
+}
+
+/* For Firefox */
+::-moz-selection {
+  background: #8aff8a;
+  color: #000;
+}

@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-// import React from 'react';
-import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
@@ -9,29 +7,33 @@ import Insights from './pages/Insight';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
-import AuthContext from './context/AuthContext';
-import { useContext } from 'react';
-
+import ProtectedRoute from './components/ProtectedRoute';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Cookies from './pages/Cookies';
 
 function App() {
-
-  const { protect } = useContext(AuthContext);
-  console.log(protect)
-
   return (
     <Router>
       <div className="min-h-screen flex flex-col relative">
         <Navbar />
         <main className="flex-grow relative z-10">
           <Routes>
-            <Route path="/" element={<Hero/>} />
+            <Route path="/" element={<Hero />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route 
-               path="/dashboard" 
-              element={protect ? <Dashboard /> : <Navigate to="/" replace />} 
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </main>

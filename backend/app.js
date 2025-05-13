@@ -7,12 +7,16 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const User = require('./models/User'); // We'll create this model
 const { authenticateToken } = require('./middleware/auth'); // We'll create this middleware
+const bodyParser =require('body-parser')
+const resumeRoutes =require('./routes/resumeRoutes')
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
+
 
 // CORS Configuration with secure settings
 app.use(cors({
@@ -44,14 +48,6 @@ const REDIRECT_URI = process.env.GITHUB_CALLBACK_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 
-// const REDIRECT_URI = 'http://localhost:5000/auth/github/callback';
-
-// app.get('/auth/github', (req, res) => {
-//   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
-//   res.redirect(githubAuthUrl);
-// });
-
-app.use('/api/resumes', resumeRoutes)
 
 // GitHub OAuth login endpoint
 app.get('/auth/github', (req, res) => {
@@ -175,9 +171,7 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-
-
-// Protected route example
+app.use('/api/resumes', resumeRoutes)
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
