@@ -11,9 +11,7 @@ const ResumeUpload = ({ onComplete }) => {
   // Configure dropzone
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
-      'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'application/msword': ['.doc']
+      'application/pdf': ['.pdf']
     },
     maxFiles: 1,
     onDrop: acceptedFiles => {
@@ -23,7 +21,7 @@ const ResumeUpload = ({ onComplete }) => {
       }
     },
     onDropRejected: () => {
-      setError('Please upload a valid PDF or DOCX file.');
+      setError('Please upload a valid PDF');
     }
   });
 

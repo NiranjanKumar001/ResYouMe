@@ -2,6 +2,8 @@ const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
+const logger = require('../utils/logger');
+
 
 const generateStateToken = () => crypto.randomBytes(16).toString('hex');
 

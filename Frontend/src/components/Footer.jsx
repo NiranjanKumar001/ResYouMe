@@ -106,7 +106,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <style jsx global>{`
+      <style jsx="true">{`
         @keyframes pulse-slow {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 1; }

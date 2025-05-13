@@ -6,14 +6,14 @@ const resumeSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,//CHANGE TO TRUE FALSE IS FOR TESTING ONLY 
+      required: true,
       index: true
     },
     filename: {                //system saved in this name
       type: String,
       required: true
     },
-    originalname: String,             //user gave
+    originalName: String,             //user gave
     path: {
       type: String,
       required: true
