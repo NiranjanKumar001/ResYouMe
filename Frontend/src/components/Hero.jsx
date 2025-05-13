@@ -1,9 +1,13 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
+// GitHub OAuth login function (matches Navbar logic)
+const githubLogin = () => {
+  window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
+};
+
 const Hero = () => {
-  // How It Works steps data
   const steps = [
     {
       title: "Upload Your Resume",
@@ -37,14 +41,11 @@ const Hero = () => {
     }
   ];
 
-  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
+      transition: { staggerChildren: 0.2 }
     }
   };
 
@@ -53,10 +54,7 @@ const Hero = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.5, ease: "easeOut" }
     }
   };
 
@@ -68,26 +66,19 @@ const Hero = () => {
         <div className="absolute inset-0 h-full w-full z-[-1]">
           <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:linear-gradient(to_bottom,transparent_10%,#000_40%)]"></div>
         </div>
-
         {/* Centered gradient blur */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <div className="w-[600px] h-[600px] bg-gradient-to-br from-blue-400/30 to-purple-500/40 rounded-full filter blur-[120px]"></div>
         </div>
-
-        {/* Floating gradient bubbles - reduced intensity */}
+        {/* Floating gradient bubbles */}
         <div className="absolute -bottom-40 left-0 right-0 h-[500px] pointer-events-none z-0">
           <div className="absolute left-[30%] bottom-20 w-[300px] h-[300px] bg-blue-500/15 rounded-full filter blur-[90px]"></div>
           <div className="absolute left-[70%] bottom-10 w-[250px] h-[250px] bg-purple-500/20 rounded-full filter blur-[80px]"></div>
         </div>
-
-        {/* Grid background at the top of the page */}
+        {/* Grid background at the top */}
         <div className="absolute inset-0 h-[50vh] pointer-events-none z-[-1]">
           <div className="relative h-full w-full bg-white">
-            <div className="absolute bottom-0 left-0 right-0 top-0 
-              bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] 
-              bg-[size:14px_24px] 
-              [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]">
-            </div>
+            <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
           </div>
         </div>
 
@@ -107,23 +98,28 @@ const Hero = () => {
           <p className="mt-[1rem] text-xl text-black max-w-3xl mx-auto">
             Transform your resume into a stunning portfolio in just three simple steps
           </p>
-          
-          <div className="relative z-20 mt-12 flex text-center justify-center "> 
-              <button className="flex items-center justify-center gap-2 bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg shadow-xl hover:bg-blue-50 hover:shadow-2xl transition-all duration-300 group animate-float"> 
-                <span className="text-lg">Get Started</span>
-                <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+
+          {/* Get Started Button (Hero) */}
+          <div className="relative z-20 mt-12 flex text-center justify-center">
+            <button
+              onClick={githubLogin}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium px-8 py-4 rounded-full shadow-lg hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 border border-gray-600/50 text-lg group animate-float"
+              aria-label="Get Started with GitHub"
+            >
+              <span>Get Started</span>
+              <svg
+                className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -131,21 +127,17 @@ const Hero = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="mt-16 relative"
           >
-            <div className="max-w-2xl mx-auto relative">
-              {/* This is now redundant since we have the centered gradient */}
-              {/* <div className="absolute -inset-20 w-[calc(100%+80px)] h-[calc(100%+80px)] bg-gradient-to-r from-blue-400/20 to-purple-500/20 rounded-xl filter blur-[80px] -z-10"></div> */}
-            </div>
+            <div className="max-w-2xl mx-auto relative"></div>
           </motion.div>
         </div>
       </section>
-      {/* How It Works Section with Radial Gradient Background */}
+
+      {/* How It Works Section */}
       <section className="py-20 px-4 relative overflow-hidden">
-        {/* Radial gradient background */}
         <div className="absolute inset-0 h-full w-full bg-slate-950">
           <div className="absolute bottom-0 left-[-20%] right-0 top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
           <div className="absolute bottom-0 right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
         </div>
-
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -158,17 +150,15 @@ const Hero = () => {
               How It Works
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Transform your resume into a stunning portfolio in just three simple steps
-            </p>            
-
+              Transform your resume into a stunning portfolio in just three simple steps.
+            </p>
           </motion.div>
-
           <motion.div
             variants={container}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8 relative z-10" 
+            className="grid md:grid-cols-3 gap-8 relative z-10"
           >
             {steps.map((step, index) => (
               <motion.div
@@ -178,33 +168,21 @@ const Hero = () => {
                 className="group perspective-1000"
               >
                 <div className="h-full bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-gray-700/50 group-hover:border-purple-400/30 transition-all duration-500 transform-style-preserve-3d">
-                  {/* Animated border effect */}
                   <div className={`absolute inset-0 rounded-2xl pointer-events-none overflow-hidden`}>
                     <div className={`absolute inset-0 bg-gradient-to-r ${step.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
                     <div className={`absolute inset-[1px] rounded-[15px] bg-slate-900`}></div>
                   </div>
-
-                  {/* Glow effect */}
                   <div className={`absolute -inset-0.5 rounded-2xl bg-gradient-to-r ${step.color} blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
-
-
                   <div className="relative z-0 h-full flex flex-col p-8">
-                    {/* Icon with futuristic design */}
                     <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-8 text-white shadow-lg transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
                       <div className="absolute inset-0 rounded-2xl border border-white/10"></div>
-                      <div className="relative z-10">
-                        {step.icon}
-                      </div>
+                      <div className="relative z-10">{step.icon}</div>
                     </div>
-
                     <h3 className="text-2xl font-bold text-white mb-4 relative">
                       {step.title}
                       <span className={`absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r ${step.color} transition-all duration-500 group-hover:w-full`}></span>
                     </h3>
-
                     <p className="text-gray-300 mb-6 flex-grow">{step.description}</p>
-
-                    {/* Futuristic button */}
                     <div className="mt-auto">
                       <div className={`inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r ${step.color} bg-opacity-10 border border-gray-700/50 group-hover:border-transparent transition-all duration-300`}>
                         <span className="text-sm font-medium text-white mr-2">Learn more</span>
@@ -225,13 +203,12 @@ const Hero = () => {
           </motion.div>
         </div>
       </section>
+
       {/* Features Section */}
       <section className="py-20 px-4 relative overflow-hidden bg-slate-950">
-        {/* Grid background with radial gradient mask */}
         <div className="absolute inset-0 h-full w-full">
           <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
         </div>
-
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -247,7 +224,6 @@ const Hero = () => {
               Everything you need to showcase your professional experience
             </p>
           </motion.div>
-
           <div className="grid md:grid-cols-2 gap-8">
             {[
               {
@@ -302,12 +278,10 @@ const Hero = () => {
 
       {/* CTA Section */}
       <section className="py-20 px-4 relative overflow-hidden bg-slate-950">
-        {/* Radial gradient background */}
         <div className="absolute inset-0 h-full w-full">
           <div className="absolute bottom-0 left-[-20%] right-0 top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
           <div className="absolute bottom-0 right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
         </div>
-
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -334,8 +308,12 @@ const Hero = () => {
             viewport={{ once: true }}
             className="flex justify-center"
           >
-            <button className="flex items-center justify-center gap-2 bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:bg-blue-50 hover:shadow-xl transition-all duration-300 group">
-              <span className="text-lg">Get Started Today</span>
+            <button
+              onClick={githubLogin}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium px-8 py-4 rounded-full shadow-lg hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 border border-gray-600/50 text-lg group"
+              aria-label="Get Started Today with GitHub"
+            >
+              <span>Get Started Today</span>
               <svg
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
                 viewBox="0 0 24 24"
