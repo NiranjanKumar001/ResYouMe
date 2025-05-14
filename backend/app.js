@@ -9,6 +9,7 @@ const User = require('./models/User'); // We'll create this model
 const { authenticateToken } = require('./middleware/auth'); // We'll create this middleware
 const bodyParser =require('body-parser')
 const resumeRoutes =require('./routes/resumeRoutes')
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -175,6 +176,7 @@ app.use('/api/resumes', resumeRoutes)
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
