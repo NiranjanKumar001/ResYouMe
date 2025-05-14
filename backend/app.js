@@ -10,6 +10,8 @@ const { authenticateToken } = require('./middleware/auth'); // We'll create this
 const bodyParser =require('body-parser')
 const resumeRoutes =require('./routes/resumeRoutes')
 const userRoutes = require("./routes/userRoutes");
+const deployroutes = require("./routes/deployroutes")
+const portfolioRoutes = require("./routes/portfolioRoutes");
 
 const app = express();
 
@@ -172,7 +174,7 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-app.use('/api/resumes', resumeRoutes)
+
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
@@ -183,6 +185,11 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+
+
+app.use('/api/resumes', resumeRoutes)
+app.use("/api", portfolioRoutes);
+app.use("/api", deployroutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -22,7 +22,10 @@ exports.buildTemplateController = async (req, res) => {
     
     // FETCH RESUME IN MONGODB BY RESUMEID AND ENSURE IT BELONGS TO LOGGED IN USER
     //THIS WILL REQUIRE A MIDDLEWARE THAT WILL GIVE THE USER.ID   
-    const resume = await Resume.findOne({ _id: resumeId, user: req.user.id });
+    //const resume = await Resume.findOne({ _id: resumeId, user: req.user.id });
+    
+    const resume = await Resume.findOne({ _id: resumeId });
+
     if (!resume) {
       return res.status(404).json({ message: "Resume not found" });
     }

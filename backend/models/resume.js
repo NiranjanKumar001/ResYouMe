@@ -19,7 +19,7 @@ const resumeSchema = new Schema(
       required: true
     },
     size: Number,               //prevent uploading large file
-    mimeType: String,            //the type of file uploded msword,pdf,ppt
+    mimetype: String,            //the type of file uploded msword,pdf,ppt
     parsedData: {
       name: String,
       email: String,
