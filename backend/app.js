@@ -178,7 +178,7 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
-app.use("/api/user", userRoutes)
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,81 +1,86 @@
-const User = require("../models/User");
-
-// Get all users
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select('-accessToken');
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get user by ID
-exports.getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select('-accessToken');
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Create new user
+const mongoose = require('mongoose');  
+const Resume = require('../models/Resume');
+const User = require('../models/User');
+// Create a new user
 exports.createUser = async (req, res) => {
-  try {
-    const { githubId, username, email, name, avatar, githubUrl } = req.body;
-    
-    const newUser = new User({
-      githubId,
-      username,
-      email,
-      name,
-      avatar,
-      githubUrl
-    });
+    try {
+      if (!req.body.accessToken) {
+        return res.status(400).json({ error: "Access token is required" });
+      }
+  
+      const user = new User(req.body);
+      const savedUser = await user.save();
+      res.status(201).json(savedUser);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };
+  
 
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+// Get user by ID (with optional resume populated)
+exports.getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("resume");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
-// Update user
+// Update user by ID
 exports.updateUser = async (req, res) => {
   try {
-    // Prevent updating certain fields directly
-    const { githubId, accessToken, isAdmin, createdAt, ...updateData } = req.body;
-    
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    ).select('-accessToken');
-    
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+      req.body,
+      { new: true }
+    );
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };
 
-// Delete user
+// Delete user by ID (will auto-delete resume from pre hook)
 exports.deleteUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) return res.status(404).json({ message: "User not found" });
+      
+      // Use findByIdAndDelete to remove the user
+      await User.findByIdAndDelete(req.params.id); // triggers the pre('remove') hook
+      res.json({ message: "User and associated resume deleted" });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-    
-    res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  };
+// Link a resume to a user
+exports.linkResume = async (req, res) => {
+    const { userId, resumeId } = req.body;
+  
+    try {
+      // Find the resume by its _id
+      const resume = await Resume.findById(resumeId);
+      if (!resume) return res.status(404).json({ message: "Resume not found" });
+  
+      // Check if the resume belongs to the correct user (this can be optional if your system doesn't require this check)
+      if (resume.user.toString() !== userId)
+        return res.status(403).json({ message: "Resume does not belong to this user" });
+  
+      // Find the user and update their resumeId (use the _id of the resume)
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { resumeId: resume._id },  // Store the _id of the resume, not a separate field
+        { new: true }
+      );
+      
+      // Respond with the updated user data
+      res.json(updatedUser);
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  };
+  
+  
