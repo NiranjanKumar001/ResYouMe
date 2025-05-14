@@ -1,13 +1,120 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
-// GitHub OAuth login function (matches Navbar logic)
+// GitHub OAuth login function
 const githubLogin = () => {
   window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
 };
 
+const FloatingShape = ({ type, size, position, rotation, delay, color }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const shapeVariants = {
+    float: {
+      y: [0, -15, 0],
+      transition: {
+        duration: 4 + Math.random() * 3,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: delay || 0
+      }
+    },
+    hover: {
+      scale: 1.2,
+      rotate: rotation + 20,
+      transition: { duration: 0.3 }
+    }
+  };
+
+  const renderShape = () => {
+    switch (type) {
+      case 'triangle':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <polygon 
+              points="50,10 90,90 10,90" 
+              fill="currentColor" 
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        );
+      case 'circle':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="45" 
+              fill="currentColor" 
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        );
+      case 'square':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <rect 
+              x="10" 
+              y="10" 
+              width="80" 
+              height="80" 
+              fill="currentColor" 
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        );
+      case 'hexagon':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <polygon 
+              points="50,5 90,25 90,75 50,95 10,75 10,25" 
+              fill="currentColor" 
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <motion.div
+      className={`absolute ${position} ${size} ${color} cursor-pointer`}
+      variants={shapeVariants}
+      initial="float"
+      animate={isHovered ? "hover" : "float"}
+      whileHover="hover"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={{ rotate: rotation }}
+    >
+      {renderShape()}
+    </motion.div>
+  );
+};
+
 const Hero = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const heroRef = useRef(null);
+  const howItWorksRef = useRef(null);
+
+  // Scroll function to navigate to How It Works section
+  const scrollToHowItWorks = () => {
+    howItWorksRef.current?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  };
+
+  // Steps array for How It Works section
   const steps = [
     {
       title: "Upload Your Resume",
@@ -41,6 +148,57 @@ const Hero = () => {
     }
   ];
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: e.clientX / window.innerWidth - 0.5,
+        y: e.clientY / window.innerHeight - 0.5
+      });
+    };
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.body.scrollHeight;
+      const progress = (scrollY / (fullHeight - windowHeight)) * 100;
+      setScrollProgress(progress);
+    };
+
+    // Create Intersection Observer to detect when hero section is visible
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.3 // Trigger when at least 10% of the hero is visible
+      }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+      if (heroRef.current) {
+        observer.unobserve(heroRef.current);
+      }
+    };
+  }, []);
+
+  const floatingShapes = [
+    { type: 'triangle', size: 'w-12 h-12', position: 'top-[20%] left-[10%] z-50', color: 'text-purple-400/30', rotation: 15, delay: 0.2 },
+    { type: 'circle', size: 'w-16 h-16', position: 'top-[30%] right-[15%] z-50', color: 'text-blue-400/40', rotation: 45, delay: 0.5 },
+    { type: 'hexagon', size: 'w-14 h-14', position: 'bottom-[25%] left-[20%] z-50', color: 'text-pink-400/30', rotation: -10, delay: 0.8 },
+    { type: 'square', size: 'w-10 h-10', position: 'bottom-[15%] right-[25%] z-50', color: 'text-indigo-400/40', rotation: 30, delay: 0.3 },
+    { type: 'triangle', size: 'w-8 h-8', position: 'top-[15%] left-[30%] z-50', color: 'text-teal-400/30', rotation: -20, delay: 0.7 },
+    { type: 'circle', size: 'w-20 h-20', position: 'bottom-[30%] right-[10%] z-50', color: 'text-amber-400/20', rotation: 60, delay: 0.4 }
+  ];
+
   const container = {
     hidden: { opacity: 0 },
     visible: {
@@ -61,20 +219,48 @@ const Hero = () => {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden h-screen flex items-center">
+      <section ref={heroRef} className="relative overflow-hidden h-screen flex items-center">
+        {/* Floating shapes */}
+        {floatingShapes.map((shape, index) => (
+          <FloatingShape
+            key={index}
+            type={shape.type}
+            size={shape.size}
+            position={shape.position}
+            color={shape.color}
+            rotation={shape.rotation}
+            delay={shape.delay}
+          />
+        ))}
+
+        {/* Dynamic gradient that follows mouse */}
+        <motion.div 
+          className="absolute inset-0 pointer-events-none"
+          animate={{
+            backgroundPosition: `${50 + mousePosition.x * 10}% ${50 + mousePosition.y * 10}%`
+          }}
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          style={{
+            background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%)'
+          }}
+        />
+
         {/* Grid background at bottom */}
         <div className="absolute inset-0 h-full w-full z-[-1]">
           <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:linear-gradient(to_bottom,transparent_10%,#000_40%)]"></div>
         </div>
+        
         {/* Centered gradient blur */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <div className="w-[600px] h-[600px] bg-gradient-to-br from-blue-400/30 to-purple-500/40 rounded-full filter blur-[120px]"></div>
         </div>
+        
         {/* Floating gradient bubbles */}
         <div className="absolute -bottom-40 left-0 right-0 h-[500px] pointer-events-none z-0">
           <div className="absolute left-[30%] bottom-20 w-[300px] h-[300px] bg-blue-500/15 rounded-full filter blur-[90px]"></div>
           <div className="absolute left-[70%] bottom-10 w-[250px] h-[250px] bg-purple-500/20 rounded-full filter blur-[80px]"></div>
         </div>
+        
         {/* Grid background at the top */}
         <div className="absolute inset-0 h-[50vh] pointer-events-none z-[-1]">
           <div className="relative h-full w-full bg-white">
@@ -95,12 +281,23 @@ const Hero = () => {
               AI Compute for Everyone
             </span>
           </motion.h1>
-          <p className="mt-[1rem] text-xl text-black max-w-3xl mx-auto">
+          
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="mt-[1rem] text-xl text-black max-w-3xl mx-auto"
+          >
             Transform your resume into a stunning portfolio in just three simple steps
-          </p>
+          </motion.p>
 
           {/* Get Started Button (Hero) */}
-          <div className="relative z-20 mt-12 flex text-center justify-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="relative z-20 mt-12 flex text-center justify-center"
+          >
             <button
               onClick={githubLogin}
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium px-8 py-4 rounded-full shadow-lg hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 border border-gray-600/50 text-lg group animate-float"
@@ -119,22 +316,54 @@ const Hero = () => {
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </button>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="mt-16 relative"
-          >
-            <div className="max-w-2xl mx-auto relative"></div>
           </motion.div>
+
+          {/* Scroll to Explore - Only visible when hero is in view */}
+          {isHeroVisible && (
+            <motion.div 
+              className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                transition: { delay: 1, duration: 0.8 }
+              }}
+              whileHover={{ y: 5 }}
+            >
+              <div className='inline-flex flex-col items-center cursor-pointer' onClick={scrollToHowItWorks}>
+                <motion.div
+                  animate={{
+                    y: [0, 10, 0],
+                    opacity: [0.6, 1, 0.6]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="mb-2"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-700"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                </motion.div>
+                <div className='inline-flex item-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-black border border-gray-700/50 group hover:border-blue-500 transition-all duration-300'>
+                  <span className="text-sm font-medium mr-2">Scroll to Explore</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 h-full w-full bg-slate-950">
+      <section ref={howItWorksRef} className="py-20 px-4 relative overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 h-full w-full">
           <div className="absolute bottom-0 left-[-20%] right-0 top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
           <div className="absolute bottom-0 right-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_farthest-side,rgba(255,0,182,.15),rgba(255,255,255,0))]"></div>
         </div>

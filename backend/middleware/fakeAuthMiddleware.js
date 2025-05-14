@@ -1,10 +1,10 @@
 // src/middlewares/fakeAuth.middleware.js
 const fakeAuthMiddleware = (req, res, next) => {
-  // Add a fake user object to the request
+
   req.user = {
-    id: "6579e2a1b54d7e3a5c8b4567", // Fake MongoDB ObjectId
-    name: "Test User",
-    email: "test@example.com"
+    id: "682361c50669f235be6e045f",
+    name: "Niranjan Kumar",
+    email: "niranjankumarofficial003@gmail.com"
   };
   next();
 };

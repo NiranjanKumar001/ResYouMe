@@ -8,8 +8,7 @@ const ResumeUpload = ({ onComplete }) => {
   const [error, setError] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Configure API base URL for development
-  const API_BASE_URL = 'http://localhost:5000'; 
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: { 'application/pdf': ['.pdf'] },
@@ -41,11 +40,15 @@ const ResumeUpload = ({ onComplete }) => {
       const formData = new FormData();
       formData.append('resume', file);
 
-      // Updated API endpoint with explicit port
+      console.log('Starting upload for:', file.name);
+
       const response = await axios.post(
-        `${API_BASE_URL}/api/resumes/upload`, // Use full URL
+        `${API_BASE_URL}/api/resumes/upload`,
         formData,
         {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
           onUploadProgress: progressEvent => {
             if (progressEvent.total) {
               const percentCompleted = Math.round(
@@ -57,13 +60,22 @@ const ResumeUpload = ({ onComplete }) => {
         }
       );
 
-      setFile(null);
+      console.log('Upload successful! Response:', response.data);
+      
+      // setFile(null);
       setUploadProgress(0);
+      
       if (onComplete) onComplete(response.data);
     } catch (err) {
+      console.error('Upload failed:', {
+        error: err.response?.data || err.message,
+        status: err.response?.status
+      });
+      
       setError(
         err.response?.data?.message ||
-        `Failed to upload resume. ${err.message}`
+        `Upload failed: ${err.message}` ||
+        'Unknown upload error'
       );
     } finally {
       setUploading(false);

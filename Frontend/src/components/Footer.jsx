@@ -36,20 +36,20 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white tracking-wider" style={{ fontFamily: "'Chakra Petch', sans-serif" }}>PRODUCT</h3>
             <ul className="space-y-2 text-sm text-gray-400 tracking-tight">
-              <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Examples</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Templates</a></li>
+              <li><a href="/insights" className="hover:text-white transition-colors">Features</a></li>
+              <li><a href="/subscription" className="hover:text-white transition-colors">Pricing</a></li>
+              <li><a href="/templates" className="hover:text-white transition-colors">Templates</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Coming Soon</a></li>
             </ul>
           </div>
 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white tracking-wider" style={{ fontFamily: "'Chakra Petch', sans-serif" }}>COMPANY</h3>
             <ul className="space-y-2 text-sm text-gray-400 tracking-tight">
-              <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+              <li><a href="/about" className="hover:text-white transition-colors">Blog</a></li>
+              <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Coming Soon</a></li>
             </ul>
           </div>
 
@@ -70,9 +70,9 @@ const Footer = () => {
               Subscribe to our newsletter for updates
             </p>
             <div className="flex">
-              <input 
-                type="email" 
-                placeholder="Your email" 
+              <input
+                type="email"
+                placeholder="Your email"
                 className="bg-gray-800/50 border border-gray-700 rounded-l-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 w-full tracking-tight"
                 style={{ fontFamily: "'DM Mono', monospace" }}
               />
@@ -88,16 +88,16 @@ const Footer = () => {
           <div className="flex items-center mb-4 md:mb-0">
             <Heart className="h-4 w-4 text-red-400 fill-red-400/20 mr-2" />
             <span className="text-sm text-gray-400 tracking-tight" style={{ fontFamily: "'DM Mono', monospace" }}>
-              Crafted with passion by Team Musafir 
+              Crafted with passion by Team Musafir
             </span>
           </div>
-          
+
           <div className="flex space-x-6 text-sm text-gray-400 tracking-tight">
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
+            <a href="/cookies" className="hover:text-white transition-colors">Cookies</a>
           </div>
-          
+
           <div className="mt-4 md:mt-0">
             <p className="text-sm text-gray-400 tracking-tight">
               © {new Date().getFullYear()} MUSAFIR. All rights reserved.

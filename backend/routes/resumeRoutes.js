@@ -5,13 +5,13 @@ const resumeController = require('../controller/resumeController');
 const uploadMiddleware = require('../middleware/upload.middleware');
 const { validate } = require('../middleware/validate.middleware');
 const resumeValidator  = require('../validators/resume.validator');
-const authMiddleware = require('../middleware/fakeAuthMiddleware'); //CHANGE THIS WITH THE REAL ONE
+const authMiddleware = require('../middleware/fakeAuthMiddleware');
 
 // Apply auth middleware to all resume routes
 router.use(authMiddleware);
 
 // Upload and parse a resume
-router.post('/upload',uploadMiddleware, // Multer middleware to handle file upload
+router.post('/upload',uploadMiddleware, 
   resumeController.uploadResume
 );
 

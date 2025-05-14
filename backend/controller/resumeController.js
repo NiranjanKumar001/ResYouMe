@@ -88,7 +88,7 @@ exports.uploadResume = async (req, res) => {
     const resumeData = await parseWithGroq(text);
 
     const resume = new Resume({
-      user: req.user.id || "6579e2a1b54d7e3a5c8b4567", // fallback for testing remove this NIRUUUUU
+      user: req.user.id , // fallback for testing remove this NIRUUUUU
       filename,
       originalname,
       path: filepath,
