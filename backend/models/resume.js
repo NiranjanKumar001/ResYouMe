@@ -29,14 +29,14 @@ const resumeSchema = new Schema(
         institution: String,
         degree: String,
         field: String,
-        startDate: Date,
-        endDate: Date
+        startDate: String,  // Changed from Date to String
+        endDate: String     // Changed from Date to String
       }],
       experience: [{
         company: String,
         position: String,
-        startDate: Date,
-        endDate: Date,
+        startDate: String,  // Changed from Date to String
+        endDate: String,    // Changed from Date to String
         description: String
       }],
       projects: [{
@@ -59,4 +59,3 @@ const resumeSchema = new Schema(
 );
 
 module.exports = mongoose.models.Resume || mongoose.model('Resume', resumeSchema);
-

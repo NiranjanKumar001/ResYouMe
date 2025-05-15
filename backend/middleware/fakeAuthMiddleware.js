@@ -13,7 +13,7 @@
 const jwt = require('jsonwebtoken');
 
 const fakeAuthMiddleware = (req, res, next) => {
-  const token = req.cookies.auth_token; // 👈 read the cookie
+  const token = req.cookies.auth_token; 
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });

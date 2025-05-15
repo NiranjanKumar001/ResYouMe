@@ -5,7 +5,6 @@ const { z } = require('zod');
 const objectIdPattern = /^[0-9a-fA-F]{24}$/;
 
 // Schema for resume upload
-// Note: File validation is handled by multer middleware
 const uploadResumeSchema = z.object({
   body: z.object({}).optional() // No required fields in body for file upload
 });
@@ -45,38 +44,39 @@ const updateResumeSchema = z.object({
     }).regex(objectIdPattern, "Invalid resume ID format")
   }),
   body: z.object({
-    name: z.string().min(1, "Name cannot be empty").optional(),
-    email: z.string().email("Invalid email format").optional(),
-    phone: z.string().optional(),
-    skills: z.array(z.string()).optional(),
-    education: z.array(
-      z.object({
-        institution: z.string().optional(),
-        degree: z.string().optional(),
-        field: z.string().optional(),
-        startDate: z.string().optional().nullable(),
-        endDate: z.string().optional().nullable()
-      })
-    ).optional(),
-    experience: z.array(
-      z.object({
-        company: z.string().optional(),
-        position: z.string().optional(),
-        startDate: z.string().optional().nullable(),
-        endDate: z.string().optional().nullable(),
-        description: z.string().optional()
-      })
-    ).optional(),
-    projects: z.array(
-      z.object({
-        name: z.string().optional(),
-        description: z.string().optional(),
-        technologies: z.array(z.string()).optional(),
-        url: z.string().url("Invalid URL format").optional().nullable()
-      })
-    ).optional()
-  }).refine(data => Object.keys(data).length > 0, {
-    message: "At least one field must be provided for update"
+    parsedData: z.object({
+      name: z.string().min(1, "Name cannot be empty"),
+      email: z.string().email("Invalid email format"),
+      phone: z.string().optional(),
+      skills: z.array(z.string()).optional(),
+      education: z.array(
+        z.object({
+          institution: z.string().min(1, "Institution cannot be empty"),
+          degree: z.string().min(1, "Degree cannot be empty"),
+          field: z.string().optional(),
+          startDate: z.string().optional(),
+          endDate: z.string().optional()
+        })
+      ).optional(),
+      experience: z.array(
+        z.object({
+          company: z.string().min(1, "Company cannot be empty"),
+          position: z.string().min(1, "Position cannot be empty"),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+          description: z.string().optional()
+        })
+      ).optional(),
+      projects: z.array(
+        z.object({
+          name: z.string().min(1, "Project name cannot be empty"),
+          description: z.string().optional(),
+          technologies: z.array(z.string()).optional(),
+          url: z.string().url("Invalid URL format").optional()
+        })
+      ).optional(),
+      rawContent: z.string().optional()
+    })
   })
 });
 
