@@ -188,7 +188,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
       parsedData: {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined, // Use undefined instead of null
+        phone: formData.phone.trim() || undefined, 
         skills: formData.skills.filter(skill => skill.trim() !== ''),
         education: formData.education
           .filter(edu => edu.institution.trim() !== '')
@@ -256,6 +256,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
     setIsSubmitting(false);
   }
 };
+
   if (unauthorized) {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg text-white text-center">
@@ -272,7 +273,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
         We've extracted information from your resume. Please review and make any necessary changes.
       </p>
 
-      {/* Section tabs */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-700">
         {['personal', 'experience', 'education', 'skills', 'projects'].map((section) => (
           <button
@@ -290,7 +290,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* Personal Information Section */}
+
         {activeSection === 'personal' && (
           <div className="space-y-4">
             <div>
