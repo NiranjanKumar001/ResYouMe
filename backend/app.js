@@ -10,7 +10,7 @@ const { authenticateToken } = require('./middleware/auth'); // We'll create this
 const bodyParser =require('body-parser')
 const resumeRoutes =require('./routes/resumeRoutes')
 const userRoutes = require("./routes/userRoutes");
-const deployroutes = require("./routes/deployroutes")
+//const deployroutes = require("./routes/deployroutes")
 const portfolioRoutes = require("./routes/portfolioRoutes");
 
 const app = express();
@@ -54,7 +54,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // GitHub OAuth login endpoint
 app.get('/auth/github', (req, res) => {
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
+  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=repo user:email`;
+
   res.redirect(githubAuthUrl);
 });
 
@@ -178,7 +179,6 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
-app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -187,9 +187,10 @@ app.use((err, req, res, next) => {
 });
 
 
+app.use('/api/users', userRoutes);
 app.use('/api/resumes', resumeRoutes)
 app.use("/api", portfolioRoutes);
-app.use("/api", deployroutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -3,6 +3,7 @@ const fs = require("fs").promises;
 const { Octokit } = require("@octokit/rest");
 const logger = require("../utils/logger");
 const User = require("../models/User");
+const { setTimeout } = require("timers/promises");
 
 // POST /api/deploy
 exports.deployToGitHub = async (req, res) => {
@@ -19,48 +20,106 @@ exports.deployToGitHub = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    console.log({user})
-    if (!user) {
-      return res.status(401).json({ message: "GitHub account not connected" });
+    if (!user || !user.username || !user.accessToken) {
+      return res.status(401).json({ message: "GitHub account not properly connected" });
     }
 
-    const githubToken = user.githubAccessToken;
+    const githubToken = user.accessToken;
     const octokit = new Octokit({ auth: githubToken });
 
-    // 1. Create a new GitHub repo
-    const { data: repo } = await octokit.repos.createForAuthenticatedUser({
-      name: repoName,
-      auto_init: false,
-      private: false,
-    });
+    let repo;
+    try {
+      // 1. Try to create a new repository
+      const response = await octokit.repos.createForAuthenticatedUser({
+        name: repoName,
+        auto_init: true,
+        private: false,
+      });
+      repo = response.data;
+    } catch (error) {
+      if (error.status === 422 && error.response.data.errors?.[0]?.message?.includes("already exists")) {
+        // Repository exists - clear existing content
+        try {
+          // Get main branch reference
+          const { data: refData } = await octokit.git.getRef({
+            owner: user.username,
+            repo: repoName,
+            ref: "heads/main",
+          });
+
+          // Get commit details to find tree SHA
+          const { data: commitData } = await octokit.git.getCommit({
+            owner: user.username,
+            repo: repoName,
+            commit_sha: refData.object.sha,
+          });
+
+          // Create empty tree (no base_tree to reset content)
+          const { data: emptyTree } = await octokit.git.createTree({
+            owner: user.username,
+            repo: repoName,
+            tree: []
+          });
+
+          // Create commit with empty tree
+          const { data: commit } = await octokit.git.createCommit({
+            owner: user.username,
+            repo: repoName,
+            message: "Clearing repository for new deployment",
+            tree: emptyTree.sha,
+            parents: [refData.object.sha],
+          });
+
+          // Update branch reference
+          await octokit.git.updateRef({
+            owner: user.username,
+            repo: repoName,
+            ref: "heads/main",
+            sha: commit.sha,
+          });
+
+          repo = { owner: { login: user.username }, name: repoName };
+        } catch (getRepoError) {
+          logger.error("Error getting existing repository:", getRepoError);
+          throw new Error(`Failed to access existing repository: ${getRepoError.message}`);
+        }
+      } else {
+        throw error;
+      }
+    }
 
     const owner = repo.owner.login;
 
-    // 2. Read all files from outputDir recursively
-    async function readFilesRecursively(dir) {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
-      const files = [];
+    // 2. Get the latest commit and its tree SHA
+    const { data: refData } = await octokit.git.getRef({
+      owner,
+      repo: repoName,
+      ref: "heads/main",
+    });
+    
+    const { data: commitData } = await octokit.git.getCommit({
+      owner,
+      repo: repoName,
+      commit_sha: refData.object.sha,
+    });
+    const baseTreeSha = commitData.tree.sha;
 
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        if (entry.isDirectory()) {
-          const nested = await readFilesRecursively(fullPath);
-          files.push(...nested);
-        } else {
-          files.push(fullPath);
-        }
+    // 3. Read files from outputDir
+    const files = [];
+    const entries = await fs.readdir(outputDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(outputDir, entry.name);
+      if (entry.isFile()) {
+        files.push(fullPath);
       }
-
-      return files;
     }
 
-    const allFiles = await readFilesRecursively(outputDir);
-
-    // 3. Create blobs for files
+    // 4. Create blobs for files
     const blobs = await Promise.all(
-      allFiles.map(async (filePath) => {
+      files.map(async (filePath) => {
         const content = await fs.readFile(filePath, "utf-8");
-        const blob = await octokit.git.createBlob({
+        const { data: blob } = await octokit.git.createBlob({
           owner,
           repo: repoName,
           content,
@@ -71,60 +130,68 @@ exports.deployToGitHub = async (req, res) => {
           path: path.relative(outputDir, filePath),
           mode: "100644",
           type: "blob",
-          sha: blob.data.sha,
+          sha: blob.sha,
         };
       })
     );
 
-    // 4. Get base commit SHA
-    const { data: baseCommitData } = await octokit.repos.getCommit({
+    // 5. Create new tree with base tree reference
+    const { data: newTree } = await octokit.git.createTree({
       owner,
       repo: repoName,
-      ref: "heads/main",
-    });
-
-    // 5. Create tree
-    const { data: tree } = await octokit.git.createTree({
-      owner,
-      repo: repoName,
-      base_tree: baseCommitData.sha,
       tree: blobs,
+      base_tree: baseTreeSha,
     });
 
-    // 6. Create commit
+    // 6. Create commit with new tree
     const { data: commit } = await octokit.git.createCommit({
       owner,
       repo: repoName,
-      message: "Initial portfolio commit",
-      tree: tree.sha,
-      parents: [baseCommitData.sha],
+      message: "Deploy portfolio",
+      tree: newTree.sha,
+      parents: [refData.object.sha],
     });
 
-    // 7. Update the ref
+    // 7. Update branch reference
     await octokit.git.updateRef({
       owner,
       repo: repoName,
       ref: "heads/main",
       sha: commit.sha,
-      force: true,
     });
 
-    // 8. Enable GitHub Pages
-    await octokit.repos.updateInformationAboutPagesSite({
-      owner,
-      repo: repoName,
-      source: {
-        branch: "main",
-        path: "/",
-      },
-    });
+    // 8. Enable GitHub Pages with retries
+    let retries = 3;
+    let pagesEnabled = false;
+    let pagesError = null;
+
+    while (retries > 0 && !pagesEnabled) {
+      try {
+        await octokit.repos.createPagesSite({
+          owner,
+          repo: repoName,
+          source: {
+            branch: "main",
+            path: "/",
+          },
+        });
+        pagesEnabled = true;
+      } catch (error) {
+        pagesError = error;
+        retries--;
+        if (retries > 0) await setTimeout(2000);
+      }
+    }
+
+    if (!pagesEnabled) {
+      throw pagesError || new Error("Failed to enable GitHub Pages after multiple attempts");
+    }
 
     const pagesUrl = `https://${owner}.github.io/${repoName}`;
 
-    // ✅ 9. Cleanup: delete outputDir after successful deployment
+    // 9. Cleanup
     await fs.rm(outputDir, { recursive: true, force: true });
 
-    // 10. Respond with the live GitHub Pages URL
     return res.status(200).json({
       message: "Portfolio deployed successfully",
       url: pagesUrl,

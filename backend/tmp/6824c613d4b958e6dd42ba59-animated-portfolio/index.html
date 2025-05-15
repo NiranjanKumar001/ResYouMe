@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niranjan Kumar - Professional</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #f1c40f;
+            --background-color: #f9f9f9;
+            --text-color: #333;
+            --glass-color: rgba(255, 255, 255, 0.2);
+            --border-color: #ccc;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: var(--glass-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header .name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header .contact {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .summary {
+            margin-bottom: 20px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .skill {
+            margin: 10px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--glass-color);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .skill .meter {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            clip-path: circle(50% at 50% 50%);
+        }
+
+        .skill .meter .fill {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            clip-path: circle(50% at 50% 50%);
+            transform: rotate(0deg);
+            transition: transform 0.5s;
+        }
+
+        .skill:hover .fill {
+            transform: rotate(360deg);
+        }
+
+        .projects {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .project {
+            margin: 10px;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            background-color: var(--glass-color);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.5s;
+        }
+
+        .project:hover {
+            transform: scale(1.1);
+        }
+
+        .project .image {
+            width: 100%;
+            height: 150px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            background-color: var(--primary-color);
+        }
+
+        .project .details {
+            padding: 10px;
+        }
+
+        .project .details .name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .project .details .description {
+            font-size: 14px;
+        }
+
+        .experience {
+            margin-bottom: 20px;
+        }
+
+        .experience .company {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .experience .position {
+            font-size: 16px;
+        }
+
+        .experience .description {
+            font-size: 14px;
+        }
+
+        .education {
+            margin-bottom: 20px;
+        }
+
+        .education .institution {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .education .degree {
+            font-size: 16px;
+        }
+
+        .education .field {
+            font-size: 14px;
+        }
+
+        .button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.5s;
+        }
+
+        .button:hover {
+            background-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="name">Niranjan Kumar</div>
+            <div class="contact">
+                <a href="mailto:niranjankumarofficial003@gmail.com">niranjankumarofficial003@gmail.com</a>
+                <span>|</span>
+                <a href="tel:6204866310">6204866310</a>
+            </div>
+        </div>
+        <div class="summary">
+            Professional profile
+        </div>
+        <div class="skills">
+            <!-- Skills Section -->
+            <div class="skill" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="meter" style="background-color: #3498db; clip-path: circle(50% at 50% 50%);">
+                    <div class="fill" style="transform: rotate(70deg);"></div>
+                </div>
+                <div class="details">
+                    <div class="name">Node.js</div>
+                    <div class="level">7/10</div>
+                </div>
+            </div>
+            <div class="skill" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="meter" style="background-color: #3498db; clip-path: circle(50% at 50% 50%);">
+                    <div class="fill" style="transform: rotate(80deg);"></div>
+                </div>
+                <div class="details">
+                    <div class="name">HTML & CSS</div>
+                    <div class="level">8/10</div>
+                </div>
+            </div>
+            <div class="skill" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="meter" style="background-color: #3498db; clip-path: circle(50% at 50% 50%);">
+                    <div class="fill" style="transform: rotate(60deg);"></div>
+                </div>
+                <div class="details">
+                    <div class="name">JavaScript</div>
+                    <div class="level">6/10</div>
+                </div>
+            </div>
+            <!-- Add more skills here -->
+        </div>
+        <div class="projects">
+            <!-- Projects Section -->
+            <div class="project" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="image" style="background-color: #3498db;"></div>
+                <div class="details">
+                    <div class="name">Fabrion - Website Builder</div>
+                    <div class="description">AI-powered website builder that allows users to generate, preview, and customize websites instantly</div>
+                </div>
+            </div>
+            <div class="project" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="image" style="background-color: #3498db;"></div>
+                <div class="details">
+                    <div class="name">Cre-Avant-Startup Pitch Website</div>
+                    <div class="description">Startup showcase website designed to pitch ideas and allow visitors to explore and connect with the team</div>
+                </div>
+            </div>
+            <div class="project" style="background-color: rgba(255, 255, 255, 0.2); border: 1px solid #ccc;">
+                <div class="image" style="background-color: #3498db;"></div>
+                <div class="details">
+                    <div class="name">Epicare- AI Healthcare Platform</div>
+                    <div class="description">Comprehensive healthcare platform allowing users to schedule appointments, view medical reports, and receive AI-powered health recommendations</div>
+                </div>
+            </div>
+            <!-- Add more projects here -->
+        </div>
+        <div class="experience">
+            <div class="company">Go Prakritik</div>
+            <div class="position">Team Freelance Full-Stack Developer</div>
+            <div class="description">Built a full e-commerce platform, developed backend with Node.js & Express.js, integrated Razorpay/Stripe for payments, designed a robust admin panel, and built responsive frontend with React.js</div>
+        </div>
+        <div class="education">
+            <div class="institution">Silicon University, Bhubaneshwar</div>
+            <div class="degree">Bachelor of Technology (B.Tech)</div>
+            <div class="field">Electronics and Instrumentation Engineering</div>
+        </div>
+        <button class="button">Contact Me</button>
+    </div>
+    <script>
+        // Add event listeners to skills and projects
+        const skills = document.querySelectorAll('.skill');
+        const projects = document.querySelectorAll('.project');
+
+        skills.forEach(skill => {
+            skill.addEventListener('mouseover', () => {
+                skill.style.transform = 'scale(1.1)';
+            });
+            skill.addEventListener('mouseout', () => {
+                skill.style.transform = 'scale(1)';
+            });
+        });
+
+        projects.forEach(project => {
+            project.addEventListener('mouseover', () => {
+                project.style.transform = 'scale(1.1)';
+            });
+            project.addEventListener('mouseout', () => {
+                project.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
