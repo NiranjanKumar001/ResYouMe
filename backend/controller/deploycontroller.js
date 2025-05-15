@@ -21,7 +21,9 @@ exports.deployToGitHub = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user || !user.username || !user.accessToken) {
-      return res.status(401).json({ message: "GitHub account not properly connected" });
+      return res
+        .status(401)
+        .json({ message: "GitHub account not properly connected" });
     }
 
     const githubToken = user.accessToken;
@@ -37,7 +39,10 @@ exports.deployToGitHub = async (req, res) => {
       });
       repo = response.data;
     } catch (error) {
-      if (error.status === 422 && error.response.data.errors?.[0]?.message?.includes("already exists")) {
+      if (
+        error.status === 422 &&
+        error.response.data.errors?.[0]?.message?.includes("already exists")
+      ) {
         // Repository exists - clear existing content
         try {
           // Get main branch reference
@@ -58,7 +63,7 @@ exports.deployToGitHub = async (req, res) => {
           const { data: emptyTree } = await octokit.git.createTree({
             owner: user.username,
             repo: repoName,
-            tree: []
+            tree: [],
           });
 
           // Create commit with empty tree
@@ -81,7 +86,9 @@ exports.deployToGitHub = async (req, res) => {
           repo = { owner: { login: user.username }, name: repoName };
         } catch (getRepoError) {
           logger.error("Error getting existing repository:", getRepoError);
-          throw new Error(`Failed to access existing repository: ${getRepoError.message}`);
+          throw new Error(
+            `Failed to access existing repository: ${getRepoError.message}`
+          );
         }
       } else {
         throw error;
@@ -96,7 +103,7 @@ exports.deployToGitHub = async (req, res) => {
       repo: repoName,
       ref: "heads/main",
     });
-    
+
     const { data: commitData } = await octokit.git.getCommit({
       owner,
       repo: repoName,
@@ -184,7 +191,10 @@ exports.deployToGitHub = async (req, res) => {
     }
 
     if (!pagesEnabled) {
-      throw pagesError || new Error("Failed to enable GitHub Pages after multiple attempts");
+      throw (
+        pagesError ||
+        new Error("Failed to enable GitHub Pages after multiple attempts")
+      );
     }
 
     const pagesUrl = `https://${owner}.github.io/${repoName}`;

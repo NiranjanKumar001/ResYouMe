@@ -216,7 +216,7 @@ exports.updateResumeData = async (req, res) => {
     }
 
     await resume.save();
-
+    
     return res.status(200).json({
       message: "Resume data updated successfully",
       resume: {
