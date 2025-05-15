@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');  
-const Resume = require('../models/Resume');
+const Resume = require('../models/resume');
 const User = require('../models/User');
 // Create a new user
 exports.createUser = async (req, res) => {

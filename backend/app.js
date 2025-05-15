@@ -5,13 +5,11 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const User = require('./models/User'); // We'll create this model
-const { authenticateToken } = require('./middleware/auth'); // We'll create this middleware
-const bodyParser =require('body-parser')
-const resumeRoutes =require('./routes/resumeRoutes')
+const User = require('./models/User');
+const { authenticateToken } = require('./middleware/auth');
+const bodyParser = require('body-parser');
+const resumeRoutes = require('./routes/resumeRoutes');
 const userRoutes = require("./routes/userRoutes");
-const deployroutes = require("./routes/deployroutes")
-const portfolioRoutes = require("./routes/portfolioRoutes");
 
 const app = express();
 
@@ -20,23 +18,21 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-
-// CORS Configuration with secure settings
+// Enhanced CORS Configuration
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Set-Cookie']
 }));
 
-// Database connection with enhanced options
+// Database connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   retryWrites: true,
-  w: 'majority',
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000
+  w: 'majority'
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => {
@@ -50,15 +46,42 @@ const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GITHUB_CALLBACK_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// Auth status endpoint - more forgiving version
+app.get('/api/auth/status', async (req, res) => {
+  try {
+    const token = req.cookies.auth_token;
+    
+    if (!token) {
+      return res.json({ isAuthenticated: false });
+    }
+    
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.json({ isAuthenticated: false });
+    }
+    
+    res.json({ 
+      isAuthenticated: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar
+      }
+    });
+  } catch (error) {
+    res.json({ isAuthenticated: false });
+  }
+});
 
-
-// GitHub OAuth login endpoint
+// GitHub OAuth endpoints
 app.get('/auth/github', (req, res) => {
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user:email`;
   res.redirect(githubAuthUrl);
 });
 
-// GitHub OAuth callback endpoint
 app.get('/auth/github/callback', async (req, res) => {
   const { code } = req.query;
   
@@ -67,7 +90,6 @@ app.get('/auth/github/callback', async (req, res) => {
   }
   
   try {
-    // 1. Exchange code for access token
     const tokenResponse = await axios.post(
       'https://github.com/login/oauth/access_token',
       {
@@ -76,9 +98,7 @@ app.get('/auth/github/callback', async (req, res) => {
         code,
         redirect_uri: REDIRECT_URI
       },
-      {
-        headers: { Accept: 'application/json' }
-      }
+      { headers: { Accept: 'application/json' } }
     );
 
     const { access_token } = tokenResponse.data;
@@ -87,15 +107,14 @@ app.get('/auth/github/callback', async (req, res) => {
       return res.status(400).redirect(`${process.env.FRONTEND_URL}/login?error=token_failed`);
     }
 
-    // 2. Get user profile
-    const userResponse = await axios.get('https://api.github.com/user', {
-      headers: { Authorization: `token ${access_token}` }
-    });
-
-    // 3. Get user emails
-    const emailsResponse = await axios.get('https://api.github.com/user/emails', {
-      headers: { Authorization: `token ${access_token}` }
-    });
+    const [userResponse, emailsResponse] = await Promise.all([
+      axios.get('https://api.github.com/user', {
+        headers: { Authorization: `token ${access_token}` }
+      }),
+      axios.get('https://api.github.com/user/emails', {
+        headers: { Authorization: `token ${access_token}` }
+      })
+    ]);
 
     const primaryEmail = emailsResponse.data.find(email => email.primary)?.email;
     
@@ -103,7 +122,6 @@ app.get('/auth/github/callback', async (req, res) => {
       return res.status(400).redirect(`${process.env.FRONTEND_URL}/login?error=email_required`);
     }
 
-    // 4. Find or create user in database
     let user = await User.findOne({ githubId: userResponse.data.id });
     
     if (!user) {
@@ -114,11 +132,10 @@ app.get('/auth/github/callback', async (req, res) => {
         email: primaryEmail,
         avatar: userResponse.data.avatar_url,
         githubUrl: userResponse.data.html_url,
-        accessToken: access_token // Store for potential API calls
+        accessToken: access_token
       });
       await user.save();
     } else {
-      // Update existing user with latest data
       user.username = userResponse.data.login;
       user.name = userResponse.data.name || userResponse.data.login;
       user.email = primaryEmail;
@@ -127,7 +144,6 @@ app.get('/auth/github/callback', async (req, res) => {
       await user.save();
     }
 
-    // 5. Generate JWT token
     const token = jwt.sign(
       { 
         id: user._id,
@@ -138,15 +154,14 @@ app.get('/auth/github/callback', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // 6. Set secure HTTP-only cookie with the token
     res.cookie('auth_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
-      sameSite: 'lax', // Helps prevent CSRF
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
     });
 
-    // 7. Redirect to dashboard
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     
   } catch (error) {
@@ -155,41 +170,26 @@ app.get('/auth/github/callback', async (req, res) => {
   }
 });
 
-// Check authentication status endpoint
-app.get('/api/auth/status', authenticateToken, (req, res) => {
-  res.json({ 
-    isAuthenticated: true, 
-    user: {
-      id: req.user.id,
-      name: req.user.name,
-      email: req.user.email,
-      avatar: req.user.avatar
-    } 
-  });
-});
-
 // Logout endpoint
 app.post('/api/auth/logout', (req, res) => {
-  res.clearCookie('auth_token');
+  res.clearCookie('auth_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
+  });
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-
-app.get('/api/dashboard', authenticateToken, (req, res) => {
-  res.json({ message: 'You have access to the dashboard', user: req.user });
-});
+// Routes
+app.use('/api/resumes', resumeRoutes);
 app.use('/api/users', userRoutes);
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
-
-
-app.use('/api/resumes', resumeRoutes)
-app.use("/api", portfolioRoutes);
-app.use("/api", deployroutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

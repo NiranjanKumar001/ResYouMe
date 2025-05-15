@@ -76,7 +76,7 @@ export default function Cookies() {
 })`}
             </pre>
           </div>
-          
+
           <div className="border p-4 rounded-lg">
             <h3 className="font-semibold mb-2">Header Configuration</h3>
             <pre className="bg-gray-100 p-4 rounded">
