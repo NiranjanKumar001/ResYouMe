@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs").promises;
-const Resume = require("../models/resume");
+const Resume = require("../models/resume.js");
 
 // Define allowed templates
 //ONLY ALLOW TO SELECT FROM THESE PREEXISTING TEMPLATES
