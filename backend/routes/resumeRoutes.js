@@ -48,5 +48,10 @@ router.patch(
   validate(resumeValidator.updateResumeSchema),
   resumeController.updateResumeData
 );
+router.put(
+  '/:id',
+  validate(resumeValidator.updateResumeSchema),
+  resumeController.updateResumeData
+);
 
 module.exports = router;

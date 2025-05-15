@@ -1,5 +1,5 @@
-//USED FOR VALIDATING THE INPUT GIVEN BY USER TO THE SCHEMA THAT WE MADE THIS IS A FUNCTION
 const { ZodError } = require('zod');
+
 const validate = (schema) => async (req, res, next) => {
   try {
     await schema.parseAsync({
@@ -20,8 +20,12 @@ const validate = (schema) => async (req, res, next) => {
         errors: formattedErrors 
       });
     }
-    return res.status(500).json({ status: 'error', message: 'Internal server error' });
+    return res.status(500).json({ 
+      status: 'error', 
+      message: 'Internal server error',
+      error: error.message 
+    });
   }
 };
 
-module.exports={validate}
+module.exports = { validate };

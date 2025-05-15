@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const ResumeUpload = ({ onComplete }) => {
   const [file, setFile] = useState(null);
@@ -8,8 +9,8 @@ const ResumeUpload = ({ onComplete }) => {
   const [error, setError] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: { 'application/pdf': ['.pdf'] },
     maxFiles: 1,
@@ -42,13 +43,19 @@ const ResumeUpload = ({ onComplete }) => {
 
       console.log('Starting upload for:', file.name);
 
+      // Get authentication token from cookies
+      const authToken = Cookies.get('authToken');
+      
       const response = await axios.post(
         `${API_BASE_URL}/api/resumes/upload`,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            // Add authorization header if using token-based auth
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
           },
+          withCredentials: true, // Important for sending cookies
           onUploadProgress: progressEvent => {
             if (progressEvent.total) {
               const percentCompleted = Math.round(
@@ -62,21 +69,27 @@ const ResumeUpload = ({ onComplete }) => {
 
       console.log('Upload successful! Response:', response.data);
       
-      // setFile(null);
-      setUploadProgress(0);
+      // Store resumeId for later use
+      if (response.data.resume && response.data.resume.id) {
+        localStorage.setItem('resumeId', response.data.resume.id);
+      }
       
-      if (onComplete) onComplete(response.data);
+      if (onComplete) onComplete(response.data.resume.parsedData);
     } catch (err) {
       console.error('Upload failed:', {
         error: err.response?.data || err.message,
         status: err.response?.status
       });
       
-      setError(
-        err.response?.data?.message ||
-        `Upload failed: ${err.message}` ||
-        'Unknown upload error'
-      );
+      if (err.response?.status === 401) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        setError(
+          err.response?.data?.message ||
+          `Upload failed: ${err.message}` ||
+          'Unknown upload error'
+        );
+      }
     } finally {
       setUploading(false);
     }

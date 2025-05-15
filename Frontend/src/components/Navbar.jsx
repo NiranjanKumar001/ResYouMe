@@ -1,40 +1,13 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { UserContext } from '../context/AuthContext'; // Correct context import
+import { UserContext } from '../context/AuthContext';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { protect, setProtect, user, loading, githubLogin, logout } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const { setProtect } = useContext(UserContext); // Correct context usage
-
-  // Check authentication status on component mount
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/auth/status`,
-          { withCredentials: true }
-        );
-        if (res.data.isAuthenticated) {
-          setUser(res.data.user);
-          setProtect(true);
-        }
-      } catch (error) {
-        setUser(null);
-        setProtect(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuthStatus();
-    // eslint-disable-next-line
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +18,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    setMobileMenuOpen(false); // Close menu on route change
+    setMobileMenuOpen(false);
   }, [location]);
 
   const toggleMobileMenu = () => {
@@ -54,21 +27,12 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
-      setUser(null);
-      setProtect(false);
+      await logout();
+      setProtect(false); // Explicitly set protect to false on logout
       navigate('/');
     } catch (error) {
-      console.error('Logout failed', error);
+      console.error('Logout failed:', error);
     }
-  };
-
-  const githubLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
   };
 
   const navItems = [
@@ -78,25 +42,20 @@ const Navbar = () => {
     { to: '/contact', label: 'Contact' }
   ];
 
+  // Show loading state if needed
+  if (loading) {
+    return (
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-700/60">
+        <div className="container mx-auto px-4 py-3 flex justify-center">
+          <div className="animate-pulse h-8 w-32 bg-gray-700 rounded-full"></div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <>
       <style jsx="true">{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-        @keyframes float {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-10px) scale(1.03); }
-        }
-        @keyframes subtleBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-3px); }
-        }
-        @keyframes gradientPulse {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-delay { animation: float 6s ease-in-out infinite 1s; }
-        .animate-bounce { animation: subtleBounce 3s ease-in-out infinite; }
         .mobile-menu {
           transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           max-height: 0;
@@ -118,24 +77,16 @@ const Navbar = () => {
             className={`relative bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 rounded-full px-4 md:px-8 flex items-center justify-between md:justify-center space-x-0 md:space-x-8 shadow-xl backdrop-blur-lg border border-gray-700/60 hover:border-gray-600/80 transition-all duration-500 ${
               scrolled ? 'h-12 shadow-lg' : 'h-14 shadow-xl'
             } w-full md:w-auto`}
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             <div className="flex items-center group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
               <Link to="/" className="text-white font-medium text-xl tracking-tight relative z-10">
-                <span
-                  className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
-                  style={{
-                    backgroundSize: '200% 200%',
-                    animation: 'gradientPulse 6s ease infinite'
-                  }}
-                >
+                <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                   Despicable Me
                 </span>
               </Link>
             </div>
 
-            {/* Hamburger */}
             <button
               className="md:hidden p-2 rounded-full focus:outline-none"
               onClick={toggleMobileMenu}
@@ -161,7 +112,6 @@ const Navbar = () => {
               </div>
             </button>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
               {navItems.map((item) => (
                 <div key={item.to} className="group relative">
@@ -178,10 +128,9 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* CTA button with enhanced gradient - hidden on mobile */}
             <div className="hidden md:block group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
-              {user ? (
+              {protect && user ? (
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/dashboard"
@@ -221,11 +170,10 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''} md:hidden`}>
           <div className="bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-2xl mx-4 mt-2 p-6 shadow-xl border border-gray-700/60">
             <div className="flex flex-col space-y-4">
-              {user && (
+              {protect && user && (
                 <div className="flex items-center space-x-3 px-4 py-3 border-b border-gray-700 mb-2">
                   <img
                     src={user.avatar}
@@ -249,7 +197,7 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
-              {user ? (
+              {protect && user ? (
                 <>
                   <Link
                     to="/dashboard"
