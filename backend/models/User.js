@@ -22,7 +22,7 @@ const userSchema = new Schema(
     accessToken: {
       type: String,
       required: true,
-      select: false,
+      select: true,
     },
     subscription: {
       type: Schema.Types.ObjectId,
