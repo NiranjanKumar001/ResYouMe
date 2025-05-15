@@ -9,44 +9,58 @@ const resumeSchema = new Schema(
       required: true,
       index: true
     },
-    filename: {                //system saved in this name
+    filename: {
       type: String,
       required: true
     },
-    originalName: String,             //user gave
+    originalName: String,
     path: {
       type: String,
       required: true
     },
-    size: Number,               //prevent uploading large file
-    mimetype: String,            //the type of file uploded msword,pdf,ppt
+    size: Number,
+    mimetype: String,
     parsedData: {
       name: String,
       email: String,
       phone: String,
+      jobRole: String,
+      about: String,
       skills: [String],
-      education: [{
-        institution: String,
-        degree: String,
-        field: String,
-        startDate: String,  // Changed from Date to String
-        endDate: String     // Changed from Date to String
-      }],
-      experience: [{
-        company: String,
-        position: String,
-        startDate: String,  // Changed from Date to String
-        endDate: String,    // Changed from Date to String
-        description: String
-      }],
-      projects: [{
-        name: String,
-        description: String,
-        technologies: [String],
-        url: String
-      }],
-      // Other parsed sections
-      rawContent: { type: String, select: false } // Full text content
+      socialLinks: {
+        github: String,
+        linkedin: String,
+        email: String // ✅ Added inside socialLinks instead of portfolio
+      },
+      education: [
+        {
+          institution: String,
+          degree: String,
+          field: String,
+          startDate: String,
+          endDate: String
+        }
+      ],
+      experience: [
+        {
+          company: String,
+          position: String,
+          startDate: String,
+          endDate: String,
+          description: String
+        }
+      ],
+      projects: [
+        {
+          name: String,
+          description: String,
+          technologies: [String],
+          url: String
+        }
+      ],
+      certifications: [String],
+      languages: [String],
+      rawContent: { type: String, select: false }
     },
     status: {
       type: String,

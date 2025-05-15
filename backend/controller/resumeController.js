@@ -1,65 +1,94 @@
 const fs = require("fs").promises;
 const path = require("path");
 const pdf = require("pdf-parse");
+const axios = require("axios");
 const Resume = require("../models/resume");
 const logger = require("../utils/logger");
-const axios = require('axios');
+require('dotenv').config();
 
+// List of GROQ API keys from environment
+const GROQ_KEYS = [
+  process.env.GROQ_API_KEY,
+  process.env.GROQ_API_KEY_2,
+  process.env.GROQ_API_KEY_3,
+  process.env.GROQ_API_KEY_4,
+].filter(Boolean); // Remove undefined ones
+
+// Parse resume text using GROQ with fallback on multiple keys
 async function parseWithGroq(text) {
-  const prompt = `You're a resume parser. Extract the following from the resume text:
+  const prompt = `You're a resume parser. Extract the following information from the provided resume text. If any field is missing or unavailable, use null or an empty array where appropriate.
 
-- Name
-- Email
-- Phone
-- Skills (as an array)
-- Education (as an array of institutions, degrees, fields, and years if available)
-- Experience (as an array of companies, positions, years, and short descriptions)
-- Projects (as an array of project names, descriptions, technologies)
+Return the result in strict valid JSON format with these fields:
 
-Respond in strict JSON format like:
+- name: string
+- email: string
+- phone: string
+- jobRole: string
+- about: string
+- skills: array of strings
+- socialLinks: object with optional keys like "github", "linkedin", "email"
+- education: array of objects (institution, degree, field, startDate, endDate)
+- experience: array of objects (company, position, startDate, endDate, description)
+- projects: array of objects (name, description, technologies)
+- certifications: array of strings
+- languages: array of strings
+
+Strict JSON format:
+
 {
-  "name": "",
-  "email": "",
-  "phone": "",
-  "skills": [],
-  "education": [],
-  "experience": [],
-  "projects": []
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "1234567890",
+  "jobRole": "Full Stack Developer",
+  "about": "Enthusiastic software engineer...",
+  "skills": ["JavaScript", "React"],
+  "socialLinks": {
+    "github": "https://github.com/johndoe",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "email": "john@example.com"
+  },
+  "education": [...],
+  "experience": [...],
+  "projects": [...],
+  "certifications": [...],
+  "languages": [...]
 }
 
 Resume Text:
 ${text}`;
 
-  try {
-    const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
-      {
-        model: "llama-3.3-70b-versatile",
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: "json_object" },
-        temperature: 0.1
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
+  for (let apiKey of GROQ_KEYS) {
+    try {
+      const response = await axios.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+          temperature: 0.1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
         }
-      }
-    );
+      );
 
-    const content = response.data.choices[0]?.message?.content;
-    return typeof content === 'string' ? JSON.parse(content) : content;
-  } catch (err) {
-    logger.error("Error parsing with Groq", err);
-    throw new Error("Failed to parse resume with Groq API");
+      const content = response.data.choices[0]?.message?.content;
+      return typeof content === "string" ? JSON.parse(content) : content;
+    } catch (err) {
+      logger.warn(`GROQ API key failed, switching to next if available: ${apiKey}`);
+    }
   }
+
+  throw new Error("All GROQ API keys failed or limit exceeded.");
 }
 
+// Upload and parse resume
 exports.uploadResume = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     const { originalname, filename, path: filepath, mimetype, size } = req.file;
     const buffer = await fs.readFile(filepath);
@@ -69,15 +98,15 @@ exports.uploadResume = async (req, res) => {
     const resume = new Resume({
       user: req.user.id,
       filename,
-      originalname,
+      originalName: originalname,
       path: filepath,
       size,
       mimetype,
       parsedData: {
         ...resumeData,
-        rawContent: text
+        rawContent: text,
       },
-      status: "parsed"
+      status: "parsed",
     });
 
     await resume.save();
@@ -86,18 +115,19 @@ exports.uploadResume = async (req, res) => {
       message: "Resume uploaded and parsed successfully",
       resume: {
         id: resume._id,
-        parsedData: resume.parsedData
-      }
+        parsedData: resume.parsedData,
+      },
     });
   } catch (error) {
     logger.error("RESUME UPLOAD ERROR", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: "Error uploading resume",
-      error: error.message 
+      error: error.message,
     });
   }
 };
 
+// Get all resumes for user
 exports.getResumes = async (req, res) => {
   try {
     const resumes = await Resume.find({ user: req.user.id })
@@ -111,16 +141,15 @@ exports.getResumes = async (req, res) => {
   }
 };
 
+// Get single resume
 exports.getResumesById = async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
-      user: req.user.id
+      user: req.user.id,
     }).select("-parsedData.rawContent -path");
 
-    if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
+    if (!resume) return res.status(404).json({ message: "Resume not found" });
 
     return res.status(200).json({ resume });
   } catch (error) {
@@ -129,25 +158,23 @@ exports.getResumesById = async (req, res) => {
   }
 };
 
+// Delete resume
 exports.deleteResume = async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
-      user: req.user.id
+      user: req.user.id,
     });
 
-    if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
+    if (!resume) return res.status(404).json({ message: "Resume not found" });
 
     try {
       await fs.unlink(resume.path);
-    } catch (unlinkError) {
+    } catch {
       logger.warn(`File not found for deletion: ${resume.path}`);
     }
 
     await Resume.deleteOne({ _id: resume._id });
-
     return res.json({ message: "Resume deleted successfully" });
   } catch (error) {
     logger.error("DELETE RESUME ERROR", error);
@@ -155,16 +182,15 @@ exports.deleteResume = async (req, res) => {
   }
 };
 
+// Re-parse resume
 exports.reparseResume = async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
-      user: req.user.id
+      user: req.user.id,
     });
 
-    if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
+    if (!resume) return res.status(404).json({ message: "Resume not found" });
 
     const buffer = await fs.readFile(resume.path);
     const { text } = await pdf(buffer);
@@ -172,7 +198,7 @@ exports.reparseResume = async (req, res) => {
 
     resume.parsedData = {
       ...resumeData,
-      rawContent: text
+      rawContent: text,
     };
     resume.status = "parsed";
 
@@ -182,36 +208,34 @@ exports.reparseResume = async (req, res) => {
       message: "Resume re-parsed successfully",
       resume: {
         id: resume._id,
-        parsedData: resume.parsedData
-      }
+        parsedData: resume.parsedData,
+      },
     });
   } catch (error) {
     logger.error("REPARSE RESUME ERROR", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       message: "Error reparsing resume",
-      error: error.message 
+      error: error.message,
     });
   }
 };
 
+// Update resume fields
 exports.updateResumeData = async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
-      user: req.user.id
+      user: req.user.id,
     });
 
-    if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
-    }
+    if (!resume) return res.status(404).json({ message: "Resume not found" });
 
     const { parsedData } = req.body;
 
-    // Update only provided fields
     if (parsedData) {
       resume.parsedData = {
         ...resume.parsedData,
-        ...parsedData
+        ...parsedData,
       };
     }
 
@@ -221,23 +245,23 @@ exports.updateResumeData = async (req, res) => {
       message: "Resume data updated successfully",
       resume: {
         id: resume._id,
-        parsedData: resume.parsedData
-      }
+        parsedData: resume.parsedData,
+      },
     });
   } catch (error) {
     logger.error("UPDATE RESUME ERROR", error);
-    
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
+
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((e) => e.message);
       return res.status(400).json({
-        message: 'Validation failed',
-        errors
+        message: "Validation failed",
+        errors,
       });
     }
-    
-    return res.status(500).json({ 
+
+    return res.status(500).json({
       message: "Error updating resume data",
-      error: error.message 
+      error: error.message,
     });
   }
 };
