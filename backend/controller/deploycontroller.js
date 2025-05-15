@@ -3,7 +3,7 @@ const fs = require("fs").promises;
 const { Octokit } = require("@octokit/rest");
 const logger = require("../utils/logger");
 const User = require("../models/User");
-const Portfolio = require("../models/portfolio.js"); // ✅ import the new model
+const Portfolio = require("../models/portfolio.js"); // ✅ Portfolio model
 const { setTimeout } = require("timers/promises");
 
 // POST /api/deploy
@@ -21,6 +21,15 @@ exports.deployToGitHub = async (req, res) => {
       return res
         .status(401)
         .json({ message: "GitHub account not properly connected" });
+    }
+
+    // 🔒 Restrict to one portfolio per user
+    const existingPortfolio = await Portfolio.findOne({ user: userId });
+    if (existingPortfolio) {
+      return res.status(400).json({
+        message: "You have already deployed a portfolio. Only one deployment is allowed per account.",
+        existingUrl: existingPortfolio.pagesUrl,
+      });
     }
 
     const githubToken = user.accessToken;
