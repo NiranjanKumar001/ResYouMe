@@ -5,7 +5,7 @@ const { deployToGitHub } = require("../controller/deploycontroller");
 const authenticate = require("../middleware/fakeAuthMiddleware"); // JWT auth middleware
 
 // Route: Build HTML template from resume data
-router.post("/build-template",buildTemplateController );
+router.post("/build-template",authenticate,buildTemplateController );
 
 // Route: Deploy to GitHub
 router.post("/deploy", authenticate, deployToGitHub);

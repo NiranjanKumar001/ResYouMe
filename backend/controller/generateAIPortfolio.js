@@ -24,7 +24,8 @@ exports.buildTemplateController = async (req, res) => {
     //THIS WILL REQUIRE A MIDDLEWARE THAT WILL GIVE THE USER.ID   
     //const resume = await Resume.findOne({ _id: resumeId, user: req.user.id });
     
-    const resume = await Resume.findOne({ _id: resumeId });
+    const resume = await Resume.findOne({ _id: resumeId,user:req.user.id});
+    console.log("myid",req.user.id)
 
     if (!resume) {
       return res.status(404).json({ message: "Resume not found" });
