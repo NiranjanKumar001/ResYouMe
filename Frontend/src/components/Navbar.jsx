@@ -82,7 +82,7 @@ const Navbar = () => {
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
               <Link to="/" className="text-white font-medium text-xl tracking-tight relative z-10">
                 <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  Despicable Me
+                  ResYouMe
                 </span>
               </Link>
             </div>
