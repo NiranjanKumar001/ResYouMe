@@ -3,20 +3,17 @@ const fs = require("fs").promises;
 const { Octokit } = require("@octokit/rest");
 const logger = require("../utils/logger");
 const User = require("../models/User");
+const Portfolio = require("../models/portfolio.js"); // ✅ import the new model
 const { setTimeout } = require("timers/promises");
 
 // POST /api/deploy
 exports.deployToGitHub = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { outputDir, repoName } = req.body;
+    const { outputDir, repoName, resumeId } = req.body;
 
-    if (!outputDir || !repoName) {
-      return res.status(400).json({ message: "Missing outputDir or repoName" });
-    }
-
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!outputDir || !repoName || !resumeId) {
+      return res.status(400).json({ message: "Missing outputDir, repoName, or resumeId" });
     }
 
     const user = await User.findById(userId);
@@ -31,7 +28,6 @@ exports.deployToGitHub = async (req, res) => {
 
     let repo;
     try {
-      // 1. Try to create a new repository
       const response = await octokit.repos.createForAuthenticatedUser({
         name: repoName,
         auto_init: true,
@@ -39,34 +35,26 @@ exports.deployToGitHub = async (req, res) => {
       });
       repo = response.data;
     } catch (error) {
-      if (
-        error.status === 422 &&
-        error.response.data.errors?.[0]?.message?.includes("already exists")
-      ) {
-        // Repository exists - clear existing content
+      if (error.status === 422 && error.response.data.errors?.[0]?.message?.includes("already exists")) {
         try {
-          // Get main branch reference
           const { data: refData } = await octokit.git.getRef({
             owner: user.username,
             repo: repoName,
             ref: "heads/main",
           });
 
-          // Get commit details to find tree SHA
           const { data: commitData } = await octokit.git.getCommit({
             owner: user.username,
             repo: repoName,
             commit_sha: refData.object.sha,
           });
 
-          // Create empty tree (no base_tree to reset content)
           const { data: emptyTree } = await octokit.git.createTree({
             owner: user.username,
             repo: repoName,
             tree: [],
           });
 
-          // Create commit with empty tree
           const { data: commit } = await octokit.git.createCommit({
             owner: user.username,
             repo: repoName,
@@ -75,7 +63,6 @@ exports.deployToGitHub = async (req, res) => {
             parents: [refData.object.sha],
           });
 
-          // Update branch reference
           await octokit.git.updateRef({
             owner: user.username,
             repo: repoName,
@@ -97,7 +84,6 @@ exports.deployToGitHub = async (req, res) => {
 
     const owner = repo.owner.login;
 
-    // 2. Get the latest commit and its tree SHA
     const { data: refData } = await octokit.git.getRef({
       owner,
       repo: repoName,
@@ -111,9 +97,8 @@ exports.deployToGitHub = async (req, res) => {
     });
     const baseTreeSha = commitData.tree.sha;
 
-    // 3. Read files from outputDir
-    const files = [];
     const entries = await fs.readdir(outputDir, { withFileTypes: true });
+    const files = [];
 
     for (const entry of entries) {
       const fullPath = path.join(outputDir, entry.name);
@@ -122,7 +107,10 @@ exports.deployToGitHub = async (req, res) => {
       }
     }
 
-    // 4. Create blobs for files
+    if (files.length === 0) {
+      return res.status(400).json({ message: "No files found in output directory" });
+    }
+
     const blobs = await Promise.all(
       files.map(async (filePath) => {
         const content = await fs.readFile(filePath, "utf-8");
@@ -142,7 +130,6 @@ exports.deployToGitHub = async (req, res) => {
       })
     );
 
-    // 5. Create new tree with base tree reference
     const { data: newTree } = await octokit.git.createTree({
       owner,
       repo: repoName,
@@ -150,7 +137,6 @@ exports.deployToGitHub = async (req, res) => {
       base_tree: baseTreeSha,
     });
 
-    // 6. Create commit with new tree
     const { data: commit } = await octokit.git.createCommit({
       owner,
       repo: repoName,
@@ -159,7 +145,6 @@ exports.deployToGitHub = async (req, res) => {
       parents: [refData.object.sha],
     });
 
-    // 7. Update branch reference
     await octokit.git.updateRef({
       owner,
       repo: repoName,
@@ -167,7 +152,6 @@ exports.deployToGitHub = async (req, res) => {
       sha: commit.sha,
     });
 
-    // 8. Enable GitHub Pages with retries
     let retries = 3;
     let pagesEnabled = false;
     let pagesError = null;
@@ -198,8 +182,18 @@ exports.deployToGitHub = async (req, res) => {
     }
 
     const pagesUrl = `https://${owner}.github.io/${repoName}`;
+    const githubRepoLink = `https://github.com/${owner}/${repoName}`;
 
-    // 9. Cleanup
+    // ✅ Save the deployment details to Portfolio model
+    await Portfolio.create({
+      user: userId,
+      resume: resumeId,
+      repoName,
+      githubRepoLink,
+      pagesUrl,
+    });
+
+    // ✅ Clean up temp output directory
     await fs.rm(outputDir, { recursive: true, force: true });
 
     return res.status(200).json({

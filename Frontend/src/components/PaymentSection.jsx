@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import biryaniImage from "../assets/react.svg";
 import Modal from './Modal';
 import Cookies from 'js-cookie';
-import { UserContext } from './AuthContext';
+import { UserContext } from '../context/AuthContext';
 
 const TemplateSelectionSection = ({ onComplete, onBack }) => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);

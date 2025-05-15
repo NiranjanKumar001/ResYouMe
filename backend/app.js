@@ -10,7 +10,9 @@ const { authenticateToken } = require('./middleware/auth');
 const bodyParser = require('body-parser');
 const resumeRoutes = require('./routes/resumeRoutes');
 const userRoutes = require("./routes/userRoutes");
-const portfolioRoutes=require("./routes/portfolioRoutes")
+//const deployroutes = require("./routes/deployroutes")
+const portfolioRoutes = require("./routes/portfolioRoutes");
+
 const app = express();
 
 // Middleware
@@ -192,6 +194,12 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
+
+
+app.use('/api/users', userRoutes);
+app.use('/api/resumes', resumeRoutes)
+app.use("/api", portfolioRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
