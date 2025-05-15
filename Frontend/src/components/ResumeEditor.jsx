@@ -268,8 +268,8 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-white">Review & Edit Your Information</h2>
-      <p className="text-gray-300 mb-6">
+      <h2 className="text-xl font-bold mb-6 text-white">Review & Edit Your Information</h2>
+      <p className="text-sm text-gray-300 mb-6">
         We've extracted information from your resume. Please review and make any necessary changes.
       </p>
 

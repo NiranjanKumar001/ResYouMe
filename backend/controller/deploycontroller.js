@@ -199,6 +199,7 @@ exports.deployToGitHub = async (req, res) => {
     return res.status(200).json({
       message: "Portfolio deployed successfully",
       url: pagesUrl,
+      git: githubRepoLink
     });
   } catch (error) {
     logger.error("GitHub Deploy Error:", error);
