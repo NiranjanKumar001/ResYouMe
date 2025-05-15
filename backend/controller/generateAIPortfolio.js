@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs").promises;
-const Resume = require("../models/resume");
+const Resume = require("../models/resume.js");
 
 const allowedTemplates = ["template1", "template2", "template3", "template4"];
 
