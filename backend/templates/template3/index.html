@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} | Developer Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --accent: #7c3aed;
+            --code-bg: #1e1e3f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%),
+                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.025) 2%, transparent 0%);
+            background-size: 100px 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: "";
+            display: block;
+            width: 3px;
+            height: 1.5rem;
+            background: var(--secondary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-item i {
+            color: var(--primary);
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: var(--code-bg);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .project-tech {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .project-tech span {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            {{#if parsedData.name}}
+                <h1>{{parsedData.name}}</h1>
+            {{/if}}
+            
+            {{#if parsedData.email || parsedData.phone}}
+                <div class="contact-info">
+                    {{#if parsedData.email}}
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:{{parsedData.email}}">{{parsedData.email}}</a>
+                        </div>
+                    {{/if}}
+                    {{#if parsedData.phone}}
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:{{parsedData.phone}}">{{parsedData.phone}}</a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/if}}
+        </header>
+
+        <main>
+            {{#if parsedData.skills.length}}
+                <section id="skills">
+                    <h2><i class="fas fa-code"></i> Skills</h2>
+                    <div class="skills-container">
+                        {{#each parsedData.skills}}
+                            <div class="skill-tag">{{this}}</div>
+                        {{/each}}
+                    </div>
+                </section>
+            {{/if}}
+
+            {{#if parsedData.projects.length}}
+                <section id="projects">
+                    <h2><i class="fas fa-laptop-code"></i> Projects</h2>
+                    <div class="card-grid">
+                        {{#each parsedData.projects}}
+                            <div class="card">
+                                {{#if this.name}}<h3>{{this.name}}</h3>{{/if}}
+                                {{#if this.description}}<p>{{this.description}}</p>{{/if}}
+                                {{#if this.technologies.length}}
+                                    <div class="project-tech">
+                                        {{#each this.technologies}}
+                                            <span>{{this}}</span>
+                                        {{/each}}
+                                    </div>
+                                {{/if}}
+                            </div>
+                        {{/each}}
+                    </div>
+                </section>
+            {{/if}}
+
+            {{#if parsedData.experience.length}}
+                <section id="experience">
+                    <h2><i class="fas fa-briefcase"></i> Experience</h2>
+                    <div class="card-grid">
+                        {{#each parsedData.experience}}
+                            <div class="card">
+                                {{#if this.position}}<h3>{{this.position}}</h3>{{/if}}
+                                {{#if this.company}}<p>{{this.company}}</p>{{/if}}
+                                {{#if this.startDate}}<p>{{this.startDate}} - {{this.endDate}}</p>{{/if}}
+                                {{#if this.description}}<p>{{this.description}}</p>{{/if}}
+                            </div>
+                        {{/each}}
+                    </div>
+                </section>
+            {{/if}}
+
+            {{#if parsedData.education.length}}
+                <section id="education">
+                    <h2><i class="fas fa-graduation-cap"></i> Education</h2>
+                    <div class="card-grid">
+                        {{#each parsedData.education}}
+                            <div class="card">
+                                {{#if this.degree}}<h3>{{this.degree}}</h3>{{/if}}
+                                {{#if this.institution}}<p>{{this.institution}}</p>{{/if}}
+                                {{#if this.field}}<p>{{this.field}}</p>{{/if}}
+                                {{#if this.startDate}}<p>{{this.startDate}} - {{this.endDate}}</p>{{/if}}
+                            </div>
+                        {{/each}}
+                    </div>
+                </section>
+            {{/if}}
+        </main>
+
+        <footer>
+            <p>© {{currentYear}} {{parsedData.name}} | Portfolio</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dynamically show/hide sections based on available data
+        document.addEventListener('DOMContentLoaded', function() {
+            // This would be replaced with actual data injection from your backend
+            const resumeData = {
+                name: "{{parsedData.name}}",
+                email: "{{parsedData.email}}",
+                phone: "{{parsedData.phone}}",
+                skills: {{{json parsedData.skills}}},
+                education: {{{json parsedData.education}}},
+                experience: {{{json parsedData.experience}}},
+                projects: {{{json parsedData.projects}}}
+            };
+
+            // Set current year in footer
+            document.querySelector('footer p').textContent = 
+                © ${new Date().getFullYear()} ${resumeData.name || ''} | Portfolio;
+        });
+    </script>
+</body>
+</html>

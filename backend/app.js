@@ -10,11 +10,8 @@ const { authenticateToken } = require('./middleware/auth');
 const bodyParser = require('body-parser');
 const resumeRoutes = require('./routes/resumeRoutes');
 const userRoutes = require("./routes/userRoutes");
-<<<<<<< HEAD
 //const deployroutes = require("./routes/deployroutes")
 const portfolioRoutes = require("./routes/portfolioRoutes");
-=======
->>>>>>> 277eb212302877540f318ad428a2b223302a8865
 
 const app = express();
 
@@ -187,16 +184,10 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-<<<<<<< HEAD
 
 app.get('/api/dashboard', authenticateToken, (req, res) => {
   res.json({ message: 'You have access to the dashboard', user: req.user });
 });
-=======
-// Routes
-app.use('/api/resumes', resumeRoutes);
-app.use('/api/users', userRoutes);
->>>>>>> 277eb212302877540f318ad428a2b223302a8865
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -204,15 +195,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-<<<<<<< HEAD
 
 app.use('/api/users', userRoutes);
 app.use('/api/resumes', resumeRoutes)
 app.use("/api", portfolioRoutes);
 
 
-=======
->>>>>>> 277eb212302877540f318ad428a2b223302a8865
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
