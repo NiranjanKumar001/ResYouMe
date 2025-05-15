@@ -18,7 +18,9 @@ exports.deployToGitHub = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user || !user.username || !user.accessToken) {
-      return res.status(401).json({ message: "GitHub account not properly connected" });
+      return res
+        .status(401)
+        .json({ message: "GitHub account not properly connected" });
     }
 
     // 🔒 Restrict to one portfolio per user
@@ -80,7 +82,9 @@ exports.deployToGitHub = async (req, res) => {
           repo = { owner: { login: user.username }, name: repoName };
         } catch (getRepoError) {
           logger.error("Error getting existing repository:", getRepoError);
-          throw new Error(`Failed to access existing repository: ${getRepoError.message}`);
+          throw new Error(
+            `Failed to access existing repository: ${getRepoError.message}`
+          );
         }
       } else {
         throw error;
@@ -180,7 +184,10 @@ exports.deployToGitHub = async (req, res) => {
     }
 
     if (!pagesEnabled) {
-      throw pagesError || new Error("Failed to enable GitHub Pages after multiple attempts");
+      throw (
+        pagesError ||
+        new Error("Failed to enable GitHub Pages after multiple attempts")
+      );
     }
 
     const pagesUrl = `https://${owner}.github.io/${repoName}`;
