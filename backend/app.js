@@ -184,10 +184,10 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
 });
 
-
-app.get('/api/dashboard', authenticateToken, (req, res) => {
-  res.json({ message: 'You have access to the dashboard', user: req.user });
-});
+// Routes
+app.use('/api/resumes', resumeRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api',portfolioRoutes)
 
 // Error handling
 app.use((err, req, res, next) => {
