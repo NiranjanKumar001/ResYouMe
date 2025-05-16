@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs").promises;
+const Handlebars = require("handlebars");
 const Resume = require("../models/resume.js");
 
 const allowedTemplates = ["template1", "template2", "template3", "template4"];
@@ -24,22 +25,47 @@ exports.buildTemplateController = async (req, res) => {
     const parsed = resume.parsedData;
 
     const templatePath = path.join(__dirname, "..", "templates", templateName, "index.html");
-    let templateHtml = await fs.readFile(templatePath, "utf-8");
+    let templateSource = await fs.readFile(templatePath, "utf-8");
+    
+    // Register Handlebars helper for the current year
+    Handlebars.registerHelper('currentYear', function() {
+      return new Date().getFullYear();
+    });
+    
+    const template = Handlebars.compile(templateSource);
+    
+    // Prepare data for the template
+    const templateData = {
+      name: parsed.name || "",
+      email: parsed.email || "",
+      phone: parsed.phone || "",
+      jobRole: parsed.jobRole || "",
+      about: parsed.about || "",
+      skills: parsed.skills || [],
+      languages: parsed.languages || [],
+      certifications: parsed.certifications || [],
+      github: parsed.socialLinks?.github || "",
+      linkedin: parsed.socialLinks?.linkedin || "",
+      projects: parsed.projects?.map(project => ({
+        name: project.name || "",
+        description: project.description || "",
+        link: project.url || ""
+      })) || [],
+      experience: parsed.experience?.map(exp => ({
+        role: exp.position || exp.company || "",
+        company: exp.company || "",
+        duration: `${exp.startDate || ""} - ${exp.endDate || ""}`,
+        description: exp.description || ""
+      })) || [],
+      education: parsed.education?.map(edu => ({
+        degree: edu.degree || "",
+        institution: edu.institution || "",
+        year: `${edu.startDate || ""} - ${edu.endDate || ""}`,
+        description: edu.field || ""
+      })) || []
+    };
 
-    const filledHtml = templateHtml
-      .replace(/{{\s*name\s*}}/g, parsed.name || "")
-      .replace(/{{\s*email\s*}}/g, parsed.email || "")
-      .replace(/{{\s*phone\s*}}/g, parsed.phone || "")
-      .replace(/{{\s*jobRole\s*}}/g, parsed.jobRole || "")
-      .replace(/{{\s*about\s*}}/g, parsed.about || "")
-      .replace(/{{\s*skills\s*}}/g, (parsed.skills || []).join(", "))
-      .replace(/{{\s*languages\s*}}/g, (parsed.languages || []).join(", "))
-      .replace(/{{\s*certifications\s*}}/g, formatCertifications(parsed.certifications || []))
-      .replace(/{{\s*github\s*}}/g, parsed.socialLinks?.github || "")
-      .replace(/{{\s*linkedin\s*}}/g, parsed.socialLinks?.linkedin || "")
-      .replace(/{{\s*projects\s*}}/g, formatProjects(parsed.projects || []))
-      .replace(/{{\s*experience\s*}}/g, formatExperience(parsed.experience || []))
-      .replace(/{{\s*education\s*}}/g, formatEducation(parsed.education || []));
+    const filledHtml = template(templateData);
 
     const outputDir = path.join(__dirname, "..", "tmp", `${resumeId}-${templateName}`);
     await fs.mkdir(outputDir, { recursive: true });
@@ -56,39 +82,3 @@ exports.buildTemplateController = async (req, res) => {
     return res.status(500).json({ message: "Failed to build portfolio template" });
   }
 };
-
-// Helper Functions
-
-function formatExperience(experience) {
-  return experience.map(exp => `
-    <div>
-      <h3>${exp.position || ""} at ${exp.company || ""}</h3>
-      <p>${exp.startDate || ""} - ${exp.endDate || ""}</p>
-      <p>${exp.description || ""}</p>
-    </div>
-  `).join("");
-}
-
-function formatEducation(education) {
-  return education.map(edu => `
-    <div>
-      <h3>${edu.degree || ""} - ${edu.institution || ""}</h3>
-      <p>${edu.field || ""}</p>
-      <p>${edu.startDate || ""} - ${edu.endDate || ""}</p>
-    </div>
-  `).join("");
-}
-
-function formatProjects(projects) {
-  return projects.map(project => `
-    <div>
-      <h3>${project.name || ""}</h3>
-      <p>${project.description || ""}</p>
-      <p><strong>Tech:</strong> ${(project.technologies || []).join(", ")}</p>
-    </div>
-  `).join("");
-}
-
-function formatCertifications(certs) {
-  return certs.map(c => `<li>${c}</li>`).join("");
-}
