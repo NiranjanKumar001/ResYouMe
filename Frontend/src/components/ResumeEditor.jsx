@@ -8,10 +8,19 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
     name: '',
     email: '',
     phone: '',
+    jobRole: '',
+    about: '',
     skills: [],
+    socialLinks: {
+      github: '',
+      linkedin: '',
+      email: ''
+    },
     education: [{ institution: '', degree: '', field: '', startDate: '', endDate: '' }],
     experience: [{ company: '', position: '', startDate: '', endDate: '', description: '' }],
-    projects: [{ name: '', description: '', technologies: [], url: '' }]
+    projects: [{ name: '', description: '', technologies: [], url: '' }],
+    certifications: [],
+    languages: []
   });
 
   const { user } = useContext(UserContext);
@@ -19,6 +28,8 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
   const [activeSection, setActiveSection] = useState('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [unauthorized, setUnauthorized] = useState(false);
+
+  const sections = ['personal', 'social', 'experience', 'education', 'skills', 'projects', 'certifications', 'languages'];
 
   // Initialize form data with user verification
   useEffect(() => {
@@ -38,7 +49,14 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
         name: initialData.name || '',
         email: initialData.email || '',
         phone: initialData.phone || '',
+        jobRole: initialData.jobRole || '',
+        about: initialData.about || '',
         skills: Array.isArray(initialData.skills) ? initialData.skills : [],
+        socialLinks: {
+          github: initialData.socialLinks?.github || '',
+          linkedin: initialData.socialLinks?.linkedin || '',
+          email: initialData.socialLinks?.email || ''
+        },
         education: initialData.education?.length > 0 
           ? initialData.education.map(edu => ({
               institution: edu.institution || '',
@@ -64,7 +82,9 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
               technologies: Array.isArray(proj.technologies) ? proj.technologies : [],
               url: proj.url || ''
             }))
-          : [{ name: '', description: '', technologies: [], url: '' }]
+          : [{ name: '', description: '', technologies: [], url: '' }],
+        certifications: Array.isArray(initialData.certifications) ? initialData.certifications : [],
+        languages: Array.isArray(initialData.languages) ? initialData.languages : []
       });
     }
   }, [initialData, user]);
@@ -77,6 +97,8 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
       if (index !== null && Array.isArray(newData[section])) {
         newData[section] = [...newData[section]];
         newData[section][index] = { ...newData[section][index], [field]: value };
+      } else if (section === 'socialLinks') {
+        newData.socialLinks = { ...newData.socialLinks, [field]: value };
       } else if (field) {
         newData[field] = value;
       } else {
@@ -113,149 +135,184 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
     }
   };
 
-  // Handle skill changes
-  const handleSkillChange = (value) => {
-    const skillsArray = value.split(',').map(skill => skill.trim()).filter(Boolean);
+  // Handle array field changes (skills, certifications, languages)
+  const handleArrayChange = (field, value) => {
+    const itemsArray = value.split(',').map(item => item.trim()).filter(Boolean);
     setFormData(prevData => ({
       ...prevData,
-      skills: skillsArray
+      [field]: itemsArray
     }));
   };
 
-  // Validate form before submission
-  const validateForm = () => {
+  // Validate current section before moving to next
+  const validateCurrentSection = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
+    if (activeSection === 'personal') {
+      if (!formData.name.trim()) {
+        newErrors.name = 'Full name is required';
+      }
+
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Email is invalid';
+      }
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (activeSection === 'experience') {
+      formData.experience.forEach((exp, index) => {
+        if (!exp.company.trim()) {
+          newErrors[`experience_${index}_company`] = 'Company name is required';
+        }
+        if (!exp.position.trim()) {
+          newErrors[`experience_${index}_position`] = 'Position is required';
+        }
+      });
     }
 
-    formData.experience.forEach((exp, index) => {
-      if (!exp.company.trim()) {
-        newErrors[`experience_${index}_company`] = 'Company name is required';
-      }
-      if (!exp.position.trim()) {
-        newErrors[`experience_${index}_position`] = 'Position is required';
-      }
-    });
-
-    formData.education.forEach((edu, index) => {
-      if (!edu.institution.trim()) {
-        newErrors[`education_${index}_institution`] = 'Institution name is required';
-      }
-      if (!edu.degree.trim()) {
-        newErrors[`education_${index}_degree`] = 'Degree is required';
-      }
-    });
+    if (activeSection === 'education') {
+      formData.education.forEach((edu, index) => {
+        if (!edu.institution.trim()) {
+          newErrors[`education_${index}_institution`] = 'Institution name is required';
+        }
+        if (!edu.degree.trim()) {
+          newErrors[`education_${index}_degree`] = 'Degree is required';
+        }
+      });
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission with user verification
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!validateForm()) {
-    return;
-  }
-
-  if (!user) {
-    setErrors({ submit: 'You must be logged in to save a resume' });
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const resumeId = initialData?._id || localStorage.getItem('resumeId');
-    const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-    if (!resumeId) {
-      throw new Error("No resume ID found");
+  // Handle next section navigation
+  const handleNext = () => {
+    if (!validateCurrentSection()) {
+      return;
     }
 
-    const authToken = Cookies.get('authToken');
-    
-    // Prepare data according to Mongoose schema
-    const requestData = {
-      parsedData: {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined, 
-        skills: formData.skills.filter(skill => skill.trim() !== ''),
-        education: formData.education
-          .filter(edu => edu.institution.trim() !== '')
-          .map(edu => ({
-            institution: edu.institution.trim(),
-            degree: edu.degree.trim(),
-            field: edu.field.trim() || undefined,
-            startDate: edu.startDate.trim() || undefined,
-            endDate: edu.endDate.trim() || undefined
-          })),
-        experience: formData.experience
-          .filter(exp => exp.company.trim() !== '')
-          .map(exp => ({
-            company: exp.company.trim(),
-            position: exp.position.trim(),
-            startDate: exp.startDate.trim() || undefined,
-            endDate: exp.endDate.trim() || undefined,
-            description: exp.description.trim() || undefined
-          })),
-        projects: formData.projects
-          .filter(proj => proj.name.trim() !== '')
-          .map(proj => ({
-            name: proj.name.trim(),
-            description: proj.description.trim() || undefined,
-            technologies: proj.technologies.filter(tech => tech.trim() !== ''),
-            url: proj.url.trim() || undefined
-          })),
-        rawContent: initialData?.parsedData?.rawContent || ''
+    const currentIndex = sections.indexOf(activeSection);
+    if (currentIndex < sections.length - 1) {
+      setActiveSection(sections[currentIndex + 1]);
+    }
+  };
+
+  // Handle previous section navigation
+  const handlePrevious = () => {
+    const currentIndex = sections.indexOf(activeSection);
+    if (currentIndex > 0) {
+      setActiveSection(sections[currentIndex - 1]);
+    }
+  };
+
+  // Handle form submission with user verification
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateCurrentSection()) {
+      return;
+    }
+
+    if (!user) {
+      setErrors({ submit: 'You must be logged in to save a resume' });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const resumeId = initialData?._id || localStorage.getItem('resumeId');
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+      if (!resumeId) {
+        throw new Error("No resume ID found");
       }
-    };
 
-    // Remove undefined values to prevent schema validation errors
-    const cleanData = JSON.parse(JSON.stringify(requestData));
+      const authToken = Cookies.get('authToken');
+      
+      // Prepare data according to Mongoose schema
+      const requestData = {
+        parsedData: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || undefined,
+          jobRole: formData.jobRole.trim() || undefined,
+          about: formData.about.trim() || undefined,
+          skills: formData.skills.filter(skill => skill.trim() !== ''),
+          socialLinks: {
+            github: formData.socialLinks.github.trim() || undefined,
+            linkedin: formData.socialLinks.linkedin.trim() || undefined,
+            email: formData.socialLinks.email.trim() || undefined
+          },
+          education: formData.education
+            .filter(edu => edu.institution.trim() !== '')
+            .map(edu => ({
+              institution: edu.institution.trim(),
+              degree: edu.degree.trim(),
+              field: edu.field.trim() || undefined,
+              startDate: edu.startDate.trim() || undefined,
+              endDate: edu.endDate.trim() || undefined
+            })),
+          experience: formData.experience
+            .filter(exp => exp.company.trim() !== '')
+            .map(exp => ({
+              company: exp.company.trim(),
+              position: exp.position.trim(),
+              startDate: exp.startDate.trim() || undefined,
+              endDate: exp.endDate.trim() || undefined,
+              description: exp.description.trim() || undefined
+            })),
+          projects: formData.projects
+            .filter(proj => proj.name.trim() !== '')
+            .map(proj => ({
+              name: proj.name.trim(),
+              description: proj.description.trim() || undefined,
+              technologies: proj.technologies.filter(tech => tech.trim() !== ''),
+              url: proj.url.trim() || undefined
+            })),
+          certifications: formData.certifications.filter(cert => cert.trim() !== ''),
+          languages: formData.languages.filter(lang => lang.trim() !== ''),
+          rawContent: initialData?.parsedData?.rawContent || ''
+        }
+      };
 
-    console.log("Sending data to server:", cleanData);
+      // Remove undefined values to prevent schema validation errors
+      const cleanData = JSON.parse(JSON.stringify(requestData));
 
-    const response = await axios.patch(
-      `${API_BASE_URL}/api/resumes/${resumeId}`,
-      cleanData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(authToken && { 'Authorization': `Bearer ${authToken}` })
-        },
-        withCredentials: true
-      }
-    );
+      console.log("Sending data to server:", cleanData);
 
-    console.log('Resume updated successfully:', response.data);
-    onComplete(response.data);
-  } catch (error) {
-    console.error('Error details:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      config: error.config
-    });
-    
-    setErrors({
-      submit: error.response?.data?.message || 
-             (error.response?.data?.errors && JSON.stringify(error.response.data.errors)) ||
-             error.message
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/resumes/${resumeId}`,
+        cleanData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
+          },
+          withCredentials: true
+        }
+      );
+
+      console.log('Resume updated successfully:', response.data);
+      onComplete(response.data);
+    } catch (error) {
+      console.error('Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+        config: error.config
+      });
+      
+      setErrors({
+        submit: error.response?.data?.message || 
+               (error.response?.data?.errors && JSON.stringify(error.response.data.errors)) ||
+               error.message
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (unauthorized) {
     return (
@@ -274,7 +331,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-700">
-        {['personal', 'experience', 'education', 'skills', 'projects'].map((section) => (
+        {sections.map((section) => (
           <button
             key={section}
             onClick={() => setActiveSection(section)}
@@ -290,7 +347,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
       </div>
 
       <form onSubmit={handleSubmit}>
-
         {activeSection === 'personal' && (
           <div className="space-y-4">
             <div>
@@ -339,15 +395,86 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
                 />
               </div>
             </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2" htmlFor="jobRole">
+                Job Role
+              </label>
+              <input
+                type="text"
+                id="jobRole"
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.jobRole}
+                onChange={(e) => handleChange(null, 'jobRole', e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2" htmlFor="about">
+                About
+              </label>
+              <textarea
+                id="about"
+                rows="3"
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.about}
+                onChange={(e) => handleChange(null, 'about', e.target.value)}
+              ></textarea>
+            </div>
           </div>
         )}
 
-        {/* Experience Section */}
+        {activeSection === 'social' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-300 mb-2" htmlFor="github">
+                GitHub
+              </label>
+              <input
+                type="url"
+                id="github"
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.socialLinks.github}
+                onChange={(e) => handleChange('socialLinks', 'github', e.target.value)}
+                placeholder="https://github.com/username"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2" htmlFor="linkedin">
+                LinkedIn
+              </label>
+              <input
+                type="url"
+                id="linkedin"
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.socialLinks.linkedin}
+                onChange={(e) => handleChange('socialLinks', 'linkedin', e.target.value)}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2" htmlFor="socialEmail">
+                Email (for social links)
+              </label>
+              <input
+                type="email"
+                id="socialEmail"
+                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.socialLinks.email}
+                onChange={(e) => handleChange('socialLinks', 'email', e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Experience Section (same as before) */}
         {activeSection === 'experience' && (
           <div>
             {formData.experience.map((exp, index) => (
               <div key={index} className="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="flex justify-between items-center mb-4">
+                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium text-white">Experience #{index + 1}</h3>
                   {formData.experience.length > 1 && (
                     <button
@@ -442,7 +569,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
                 </div>
               </div>
             ))}
-
             <button
               type="button"
               onClick={() => addItem('experience')}
@@ -453,7 +579,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
           </div>
         )}
 
-        {/* Education Section */}
+        {/* Education Section (same as before) */}
         {activeSection === 'education' && (
           <div>
             {formData.education.map((edu, index) => (
@@ -564,6 +690,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
           </div>
         )}
 
+
         {/* Skills Section */}
         {activeSection === 'skills' && (
           <div className="mb-6">
@@ -575,7 +702,7 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
               rows="4"
               className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.skills.join(', ')}
-              onChange={(e) => handleSkillChange(e.target.value)}
+              onChange={(e) => handleArrayChange('skills', e.target.value)}
               placeholder="e.g., JavaScript, React, Node.js, Python"
             ></textarea>
 
@@ -595,12 +722,12 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
           </div>
         )}
 
-        {/* Projects Section */}
+        {/* Projects Section (same as before) */}
         {activeSection === 'projects' && (
           <div>
             {formData.projects.map((project, index) => (
               <div key={index} className="mb-6 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <div className="flex justify-between items-center mb-4">
+               <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-medium text-white">Project #{index + 1}</h3>
                   {formData.projects.length > 1 && (
                     <button
@@ -669,7 +796,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
                 </div>
               </div>
             ))}
-
             <button
               type="button"
               onClick={() => addItem('projects')}
@@ -680,6 +806,68 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
           </div>
         )}
 
+        {/* Certifications Section */}
+        {activeSection === 'certifications' && (
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2" htmlFor="certifications">
+              Certifications (comma separated)
+            </label>
+            <textarea
+              id="certifications"
+              rows="4"
+              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.certifications.join(', ')}
+              onChange={(e) => handleArrayChange('certifications', e.target.value)}
+              placeholder="e.g., AWS Certified, Google Analytics, PMP"
+            ></textarea>
+
+            <div className="mt-4">
+              <p className="text-gray-300 mb-2">Your Certifications:</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.certifications.map((cert, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm"
+                  >
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Languages Section */}
+        {activeSection === 'languages' && (
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2" htmlFor="languages">
+              Languages (comma separated)
+            </label>
+            <textarea
+              id="languages"
+              rows="4"
+              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={formData.languages.join(', ')}
+              onChange={(e) => handleArrayChange('languages', e.target.value)}
+              placeholder="e.g., English, Spanish, French"
+            ></textarea>
+
+            <div className="mt-4">
+              <p className="text-gray-300 mb-2">Your Languages:</p>
+              <div className="flex flex-wrap gap-2">
+                {formData.languages.map((lang, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm"
+                  >
+                    {lang}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Error message */}
         {errors.submit && (
           <div className="mb-6 p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-400">
@@ -687,23 +875,46 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
           </div>
         )}
 
-        {/* Form actions */}
+        {/* Navigation buttons */}
         <div className="flex justify-between mt-8">
-          <button
-            type="button"
-            onClick={onBack}
-            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
-            disabled={isSubmitting}
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Save & Continue'}
-          </button>
+          {activeSection === 'personal' ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              disabled={isSubmitting}
+            >
+              Back
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              disabled={isSubmitting}
+            >
+              Previous
+            </button>
+          )}
+
+          {activeSection !== sections[sections.length - 1] ? (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save & Continue'}
+            </button>
+          )}
         </div>
       </form>
     </div>
