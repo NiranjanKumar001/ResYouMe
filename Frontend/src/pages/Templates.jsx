@@ -173,7 +173,7 @@ function Templates() {
             <div className="relative z-10 h-full">
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-2xl font-bold text-white">Minimalist</h3>
+                  <h3 className="text-2xl font-bold text-white">Onyx</h3>
                   <span className="px-3 py-1 bg-blue-900/50 text-blue-300 rounded-full text-sm font-medium">Popular</span>
                 </div>
                 <p className="text-gray-300 mb-8">Clean, professional design that highlights your content without distractions.</p>
@@ -181,8 +181,8 @@ function Templates() {
                 <div className="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl overflow-hidden border border-gray-700/50 mb-8">
                   {/* Template preview content */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-3/4 h-3/4 bg-gray-700/50 rounded-lg border border-gray-600/50 flex items-center justify-center">
-                      <img src='' alt=''/>
+                    <div className="w-3/4 h-3/4 bg-gray-700/50 rounded-lg border border-gray-600/50 flex items-center justify-center" >
+                      <img src='./onyx.jpeg' alt=''/>
                     </div>
                   </div>
                 </div>
@@ -192,9 +192,14 @@ function Templates() {
                     <div className="w-3 h-3 rounded-full bg-green-400"></div>
                     <span className="text-sm text-gray-300">Responsive</span>
                   </div>
-                  <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300">
+                  <a 
+                    href="https://sweet-parfait-a56ca9.netlify.app/onyx.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+                  >
                     Live preview
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -224,7 +229,7 @@ function Templates() {
             <div className="relative z-10 h-full">
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-2xl font-bold text-white">Modern</h3>
+                  <h3 className="text-2xl font-bold text-white">Duality</h3>
                   <span className="px-3 py-1 bg-purple-900/50 text-purple-300 rounded-full text-sm font-medium">New</span>
                 </div>
                 <p className="text-gray-300 mb-8">Contemporary design with dynamic elements, make your portfolio stand out.</p>
@@ -233,7 +238,7 @@ function Templates() {
                   {/* Template preview content */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-3/4 h-3/4 bg-gray-700/50 rounded-lg border border-gray-600/50 flex items-center justify-center">
-                      <img src='' alt=''/>
+                      <img src='./duality.jpeg' alt=''/>
                     </div>
                   </div>
                 </div>
@@ -243,9 +248,14 @@ function Templates() {
                     <div className="w-3 h-3 rounded-full bg-green-400"></div>
                     <span className="text-sm text-gray-300">Responsive</span>
                   </div>
-                  <button className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300">
+                  <a 
+                    href="https://starlit-platypus-fff4a2.netlify.app/duality.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+                  >
                     Live preview
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>

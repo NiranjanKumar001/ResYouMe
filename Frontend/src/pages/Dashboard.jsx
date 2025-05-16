@@ -16,6 +16,8 @@ function Dashboard() {
   const [generationStatus, setGenerationStatus] = useState('pending');
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showReloadAlert, setShowReloadAlert] = useState(false);
+  
   const navigate = useNavigate();
   const { user, protect, loading: authLoading } = useContext(UserContext);
 
@@ -27,6 +29,32 @@ function Dashboard() {
     { id: 3, title: 'Portfolio Generation', description: 'AI generates your portfolio' },
     // { id: 4, title: 'Generate Portfolio', description: 'AI generates your portfolio' }
   ];
+
+  // Detect page reload
+  useEffect(() => {
+    const handleLoad = () => {
+      if (sessionStorage.getItem('pageVisited')) {
+        setShowReloadAlert(true);
+      } else {
+        sessionStorage.setItem('pageVisited', 'true');
+      }
+    };
+    
+    window.addEventListener('load', handleLoad);
+    
+    // Add beforeunload event to warn before closing/refreshing
+    const alertUser = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    
+    window.addEventListener('beforeunload', alertUser);
+    
+    return () => {
+      window.removeEventListener('load', handleLoad);
+      window.removeEventListener('beforeunload', alertUser);
+    };
+  }, []);
 
   // Fetch user's resume data on component mount
   useEffect(() => {
@@ -117,36 +145,6 @@ function Dashboard() {
     nextStep();
   };
 
-  // Generate portfolio when payment is complete and we're on step 4
-  // useEffect(() => {
-  //   if (paymentComplete && currentStep === 4 && editedResumeData) {
-  //     setGenerationStatus('processing');
-
-  //     // Simulate API call to generate portfolio
-  //     const generatePortfolio = async () => {
-  //       try {
-  //         // In a real app, this would be an API call to your backend
-  //         const response = await axios.post(
-  //           `${API_BASE_URL}/api/portfolios/generate`, 
-  //           { resumeData: editedResumeData },
-  //           { withCredentials: true }
-  //         );
-
-  //         // For now, simulate a delay
-  //         await new Promise(resolve => setTimeout(resolve, 3000));
-
-  //         setGenerationStatus('complete');
-  //         setPortfolioUrl(`https://portfolio.example.com/${user?.username || 'user'}`);
-  //       } catch (error) {
-  //         console.error('Portfolio generation failed:', error);
-  //         setGenerationStatus('failed');
-  //       }
-  //     };
-
-  //     generatePortfolio();
-  //   }
-  // }, [paymentComplete, currentStep, editedResumeData, API_BASE_URL, user]);
-
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
@@ -169,6 +167,28 @@ function Dashboard() {
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className='mt-[4rem]'>
+          
+          {/* Reload Alert Banner */}
+          {showReloadAlert && (
+            <div className="mb-6 p-3 bg-[#2D2B1B] text-yellow-400 rounded-lg border border-yellow-800">
+              <div className="flex items-center justify-between">
+                <p className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  The page has been reloaded. Your progress may have been reset.
+                </p>
+                <button 
+                  onClick={() => setShowReloadAlert(false)} 
+                  className="text-yellow-400 hover:text-yellow-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Step indicator */}
           <StepIndicator steps={steps} currentStep={currentStep} />
@@ -187,7 +207,6 @@ function Dashboard() {
             )}
 
             {currentStep === 3 && (
-             
               <PortfolioGenerate
                 onComplete={handlePaymentComplete}
                 onBack={prevStep}

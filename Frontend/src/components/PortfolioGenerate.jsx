@@ -8,6 +8,7 @@ const PaymentSection = () => {
   const [resumeId, setResumeId] = useState(null);
   const [deploymentResult, setDeploymentResult] = useState(null);
   const [isDeploying, setIsDeploying] = useState(false);
+  const [showBiryaniModal, setShowBiryaniModal] = useState(false);
   const [deploymentSteps, setDeploymentSteps] = useState([
     { id: 1, name: 'Validating template', status: 'pending', time: '2-3s' },
     { id: 2, name: 'Building portfolio', status: 'pending', time: '10-15s' },
@@ -40,7 +41,16 @@ const PaymentSection = () => {
     );
   };
 
-  const handleDeployment = async () => {
+  const handleDeploymentClick = () => {
+    setShowBiryaniModal(true);
+  };
+
+  const handleSkipBiryani = () => {
+    setShowBiryaniModal(false);
+    startDeployment();
+  };
+
+  const startDeployment = async () => {
     if (!selectedTemplate) {
       setError('Please select a template');
       return;
@@ -154,6 +164,44 @@ const PaymentSection = () => {
 
   return (
     <div className="container mx-auto p-4 bg-[#0F1524] text-white rounded-lg">
+      {showBiryaniModal && (
+        <div className="fixed inset-0 bg-gray-800 rounded-2xl bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1F2E] rounded-xl p-6 max-w-md w-full border border-[#2A3042] shadow-xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-white">Support Our Work</h3>
+              <button 
+                onClick={() => setShowBiryaniModal(false)}
+                className="text-gray-400 hover:text-white transition-colors duration-200 rounded-full p-1 hover:bg-[#232836]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-6 w-full h-[12rem]">
+              <img 
+                src="./payment.jpeg" 
+                alt="Biryani"
+                className="w-full h-[10rem] px-[7rem] object-fit rounded-lg mb-4 border border-[#2A3042]"
+              />
+              <p className="text-gray-300 text-sm text-center mb-4 leading-relaxed">
+                Enjoying our service? Buy us a biryani to support our work and keep the service free for everyone!
+              </p>
+            </div>
+            
+            <div className="flex justify-between space-x-4">
+              <button
+                onClick={handleSkipBiryani}
+                className="mt-4 px-4 h-[2rem] text-center bg-gray-600  text-gray-300 rounded-lg flex-1 transition-all duration-300 border border-[#2A3042] font-medium hover:bg-red-400"
+              >
+                Skip for now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!isDeploying ? (
         <>
           <h2 className="text-2xl font-bold mb-6 text-white">Select Your Template</h2>
@@ -213,10 +261,9 @@ const PaymentSection = () => {
             })}
           </div>
 
-
           <div className="flex justify-center">
             <button
-              onClick={handleDeployment}
+              onClick={handleDeploymentClick}
               disabled={isLoading || !selectedTemplate || !resumeId}
               className={`px-6 py-3 rounded-lg text-white font-medium text-lg transition-all duration-300 ${isLoading || !selectedTemplate || !resumeId
                   ? 'bg-gray-700 text-gray-400 cursor-not-allowed'

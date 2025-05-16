@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Niranjan Kumar - Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Light mode colors - Soft Beige palette */
+      --bg: #F5F0E5;
+      --text: #5E4B3C;
+      --accent: #C8A27C;
+      --card: #FFF9EE;
+      --nav: rgba(245, 240, 229, 0.95);
+      --tag: #EFE5D3;
+      --border: #E6D6BE;
+      --shadow: 0 4px 12px rgba(200,162,124,0.1);
+      --transition: all 0.3s ease;
+      
+      /* Section colors - Light mode */
+      --about-bg: #DFD0B8;
+      --skills-bg: #E8DBC7;
+      --projects-bg: #D5C4A8;
+      --experience-bg: #E2D4B7;
+      --education-bg: #EAE0CF;
+      --contact-bg: #D8C9B1;
+    }
+    
+    .dark {
+      /* Dark mode colors - Dark Grayish Blue palette */
+      --bg: #222831;
+      --text: #EEEEEE;
+      --accent: #00ADB5;
+      --card: #2D343E;
+      --nav: rgba(34, 40, 49, 0.95);
+      --tag: #393E46;
+      --border: #4A5058;
+      --shadow: 0 4px 12px rgba(0,0,0,0.3);
+      
+      /* Section colors - Dark mode */
+      --about-bg: #2D343E;
+      --skills-bg: #393E46;
+      --projects-bg: #32383F;
+      --experience-bg: #2F353D;
+      --education-bg: #343A42;
+      --contact-bg: #2A3038;
+    }
+
+    /* Preloader styles */
+    #preloader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: var(--about-bg);
+      left: 0;
+      top: 0;
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease;
+    }
+
+    .preloader-content {
+      text-align: center;
+    }
+
+    .preloader-text {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 20px;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .preloader-text span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s forwards cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .progress-bar {
+      width: 280px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      animation: progress 5s cubic-bezier(0.1, 0.05, 0.25, 1) forwards;
+    }
+
+    @keyframes progress {
+      0% { width: 0; }
+      10% { width: 10%; }
+      30% { width: 40%; }
+      50% { width: 60%; }
+      70% { width: 75%; }
+      90% { width: 90%; }
+      100% { width: 100%; }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-weight: 300;
+      transition: var(--transition);
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: var(--nav);
+      padding: 15px 5%;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 400;
+      font-size: 15px;
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: var(--accent);
+      transition: var(--transition);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    nav a.active::after {
+      width: 100%;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 8px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .toggle-btn:hover {
+      background-color: var(--tag);
+      color: var(--accent);
+    }
+
+    section {
+      min-height: 100vh;
+      width: 100%;
+      padding: 120px 5% 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: var(--transition);
+      scroll-snap-align: start;
+    }
+
+    .content-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    #about {
+      background-color: var(--about-bg);
+    }
+
+    #skills {
+      background-color: var(--skills-bg);
+    }
+
+    #projects {
+      background-color: var(--projects-bg);
+    }
+
+    #experience {
+      background-color: var(--experience-bg);
+    }
+
+    #education {
+      background-color: var(--education-bg);
+    }
+
+    #contact {
+      background-color: var(--contact-bg);
+    }
+
+    h2 {
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 20px;
+      font-size: 32px;
+      letter-spacing: -0.5px;
+      position: relative;
+      display: inline-block;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      width: 40%;
+      height: 3px;
+      bottom: -6px;
+      left: 0;
+      background-color: var(--accent);
+      border-radius: 2px;
+    }
+
+    h3 {
+      font-weight: 500;
+      margin: 30px 0 15px;
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    p {
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .skills-container, .certifications-container, .languages-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .skills span, .certifications span, .languages span {
+      display: inline-block;
+      background: var(--tag);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+    }
+
+    .skills span:hover, .certifications span:hover, .languages span:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .contact-info a {
+      display: inline-flex;
+      align-items: center;
+      color: var(--text);
+      text-decoration: none;
+      padding: 10px 18px;
+      background-color: var(--tag);
+      border-radius: 24px;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+    }
+
+    .contact-info a:hover {
+      background-color: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .projects-container, .experience-container, .education-container {
+      margin-top: 15px;
+    }
+
+    .experience-item, .education-item {
+      margin-bottom: 30px;
+    }
+
+    .experience-item h3, .education-item h3 {
+      margin-bottom: 5px;
+    }
+
+    .experience-date, .education-date {
+      font-style: italic;
+      color: var(--text);
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text);
+      font-size: 14px;
+      opacity: 0.8;
+      background-color: var(--contact-bg);
+    }
+
+    .scroll-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+      
+      header h1 {
+        margin-bottom: 15px;
+      }
+      
+      nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .nav-links {
+        gap: 15px;
+      }
+      
+      .toggle-btn {
+        margin-left: 15px;
+      }
+      
+      .content-wrapper {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader">
+    <div class="preloader-content">
+      <div class="preloader-text">
+        <span style="animation-delay: 0.1s">L</span>
+        <span style="animation-delay: 0.15s">e</span>
+        <span style="animation-delay: 0.2s">t</span>
+        <span style="animation-delay: 0.25s">'</span>
+        <span style="animation-delay: 0.3s">s</span>
+        <span style="animation-delay: 0.35s">&nbsp;</span>
+        <span style="animation-delay: 0.4s">e</span>
+        <span style="animation-delay: 0.45s">x</span>
+        <span style="animation-delay: 0.5s">p</span>
+        <span style="animation-delay: 0.55s">l</span>
+        <span style="animation-delay: 0.6s">o</span>
+        <span style="animation-delay: 0.65s">r</span>
+        <span style="animation-delay: 0.7s">e</span>
+        <span style="animation-delay: 0.75s">&nbsp;</span>
+        <span style="animation-delay: 0.8s">w</span>
+        <span style="animation-delay: 0.85s">h</span>
+        <span style="animation-delay: 0.9s">o</span>
+        <span style="animation-delay: 0.95s">&nbsp;</span>
+        <span style="animation-delay: 1s">I</span>
+        <span style="animation-delay: 1.05s">&nbsp;</span>
+        <span style="animation-delay: 1.1s">a</span>
+        <span style="animation-delay: 1.15s">m</span>
+        <span style="animation-delay: 1.2s">.</span>
+        <span style="animation-delay: 1.25s">.</span>
+        <span style="animation-delay: 1.3s">.</span>
+      </div>
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+
+  <header>
+    <h1 id="name">Niranjan Kumar</h1>
+    <nav>
+      <div class="nav-links">
+        <a href="#about" data-target="about">About</a>
+        <a href="#skills" data-target="skills">Skills</a>
+        <a href="#projects" data-target="projects">Projects</a>
+        <a href="#experience" data-target="experience">Experience</a>
+        <a href="#education" data-target="education">Education</a>
+        <a href="#contact" data-target="contact">Contact</a>
+      </div>
+      <button class="toggle-btn" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+      </button>
+    </nav>
+  </header>
+
+  <div class="scroll-container">
+    <section id="about">
+      <div class="content-wrapper">
+        <h2>About Me</h2>
+        <p id="about-text">Aspiring Full Stack Developer from Silicon University with experience in building modern web applications using Next.js and the MERN stack.</p>
+        <h3>Role: Frontend Developer Intern</h3>
+        <p>Email: niranjankumarofficial003@gmail.com | Phone: 6204866310</p>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="content-wrapper">
+        <h2>Skills</h2>
+        <div class="skills-container skills" id="skills-list">
+          <span>Node.js</span>
+          <span>HTML &amp; CSS</span>
+          <span>JavaScript</span>
+          <span>React</span>
+          <span>Java</span>
+          <span>Next.js</span>
+          <span>Express.js</span>
+          <span>MongoDB</span>
+          <span>Sanity</span>
+          <span>Three.js</span>
+          <span>Netlify</span>
+          <span>Blender</span>
+          <span>Docker</span>
+          <span>Data structures using C</span>
+          <span>Render</span>
+          <span>Firebase</span>
+          <span>Figma</span>
+          <span>UI/UX</span>
+          <span>Vercel</span>
+        </div>
+
+        <h3>Certifications</h3>
+        <div class="certifications-container certifications" id="certifications-list">
+          <span>Understanding Incubation and Entrepreneurship, SWAYAM(IIT Kharagpur)</span>
+          <span>MERN Stack, Codebeat</span>
+          <span>Foundational Course on Machine Learning using Python, SiliconTech</span>
+        </div>
+
+        <h3>Languages</h3>
+        <div class="languages-container languages" id="languages-list">
+          <span>English</span>
+          <span>Hindi</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="content-wrapper">
+        <h2>Projects</h2>
+        <div class="projects-container" id="projects-list">
+          <div class="project-item">
+            <h3>Fabrion - Website Builder</h3>
+            <p>AI-powered website builder that allows users to generate, preview, and customize websites instantly.</p>
+            
+          </div>
+          <div class="project-item">
+            <h3>Cre-Avant-Startup Pitch Website</h3>
+            <p>Startup showcase website designed to pitch ideas and allow visitors to explore and connect with the team.</p>
+            
+          </div>
+          <div class="project-item">
+            <h3>Epicare- AI Healthcare Platform</h3>
+            <p>Comprehensive healthcare platform allowing users to schedule appointments, view medical reports, and receive AI-powered health recommendations.</p>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience">
+      <div class="content-wrapper">
+        <h2>Experience</h2>
+        <div class="experience-container" id="experience-list">
+          <div class="experience-item">
+            <h3>Team Freelance Full-Stack Developer at Go Prakritik</h3>
+            <p class="experience-date">January 2025 - Present</p>
+            <p>Built a full e-commerce platform for Go Prakritik, focused on organic products. Developed backend with Node.js &amp; Express.js for listings, auth, orders, and checkout. Integrated Razorpay/Stripe for payments and real-time shipping tracking. Designed a robust admin panel for product, order, and inventory management. Built responsive frontend with React.js for smooth multi-device experience. Managed full-stack deployment, version control (Git), and performance tuning.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="education">
+      <div class="content-wrapper">
+        <h2>Education</h2>
+        <div class="education-container" id="education-list">
+          <div class="education-item">
+            <h3>Bachelor of Technology (B.Tech) at Silicon University, Bhubaneshwar</h3>
+            <p class="education-date">August 2022 - Present</p>
+            <p>Electronics and Instrumentation Engineering</p>
+          </div>
+          <div class="education-item">
+            <h3>Senior Secondary(ISC) at Motilal Nehru Public School, Jamshedpur</h3>
+            <p class="education-date">July 2019 - May 2021</p>
+            <p></p>
+          </div>
+          <div class="education-item">
+            <h3>Matriculation(ICSE) at Ramakrishna Vivekananda International English School, Barsole</h3>
+            <p class="education-date">June 2017 - April 2019</p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="content-wrapper">
+        <h2>Contact</h2>
+        <div class="contact-info">
+          <a href="mailto:niranjankumarofficial003@gmail.com" id="email-link">Email</a>
+          <a href="https://github.com/Go-Prakritik" target="_blank" id="github-link">GitHub</a>
+          <a href="https://www.linkedin.com" target="_blank" id="linkedin-link">LinkedIn</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Niranjan Kumar - All Rights Reserved</p>
+  </footer>
+  <script>
+    // Preloader fade out with smooth transition
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const preloader = document.getElementById('preloader');
+        preloader.style.opacity = '0';
+        setTimeout(function() {
+          preloader.style.display = 'none';
+          
+          // Add entrance animations for content sections
+          document.querySelectorAll('section').forEach((section, index) => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            
+            setTimeout(() => {
+              section.style.opacity = '1';
+              section.style.transform = 'translateY(0)';
+            }, 100 * index);
+          });
+          
+        }, 800);
+      }, 5500); // 5.5 seconds for the animation + 0.8s fade
+    });
+
+    // Dark/light mode toggle
+    const body = document.body;
+    const toggleBtn = document.querySelector('.toggle-btn');
+    const moonIcon = toggleBtn.querySelector('i');
+    
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.add('dark');
+        moonIcon.classList.replace('fa-moon', 'fa-sun');
+      } else {
+        body.classList.remove('dark');
+        moonIcon.classList.replace('fa-sun', 'fa-moon');
+      }
+      localStorage.setItem('theme', theme);
+    }
+    
+    function toggleTheme() {
+      const current = body.classList.contains('dark') ? 'light' : 'dark';
+      setTheme(current);
+    }
+    
+    // Check for user preference
+    function detectPreferredTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme;
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    // Update active nav link based on scroll position
+    function updateActiveNavLink() {
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('nav a[data-target]');
+      
+      let current = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.scrollY >= sectionTop - 200) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-target') === current) {
+          link.classList.add('active');
+        }
+      });
+    }
+    
+    // Initialize the page
+    window.onload = () => {
+      const theme = detectPreferredTheme();
+      setTheme(theme);
+      
+      // Set current year in footer
+      document.querySelector('footer p').innerHTML = `&copy; ${new Date().getFullYear()} Niranjan Kumar - All Rights Reserved`;
+      
+      // Smooth scroll with JS animation
+      document.querySelectorAll('nav a[data-target]').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-target');
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+      
+      // Update active nav link on scroll
+      const scrollContainer = document.querySelector('.scroll-container');
+      scrollContainer.addEventListener('scroll', updateActiveNavLink);
+      
+      // Initialize with first nav link active
+      document.querySelector('nav a[data-target="about"]').classList.add('active');
+    };
+  </script>
+</body>
+</html>
