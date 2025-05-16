@@ -149,7 +149,7 @@ exports.deployToGitHub = async (req, res) => {
     const { data: commit } = await octokit.git.createCommit({
       owner,
       repo: repoName,
-      message: "Deploy portfolio",
+      message: "@Team Musafir",
       tree: newTree.sha,
       parents: [refData.object.sha],
     });

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabyasachi Patra | Developer Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --accent: #7c3aed;
+            --code-bg: #1e1e3f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%),
+                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.025) 2%, transparent 0%);
+            background-size: 100px 100px;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
+            z-index: -1;
+        }
+
+        header {
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            opacity: 0.05;
+            transform: rotate(-45deg);
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2::before {
+            content: "";
+            display: block;
+            width: 3px;
+            height: 1.5rem;
+            background: var(--secondary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-item i {
+            color: var(--primary);
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: var(--code-bg);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-tech {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .project-tech span {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .terminal-section {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot:nth-child(1) {
+            background: #ff5f56;
+        }
+
+        .terminal-dot:nth-child(2) {
+            background: #ffbd2e;
+        }
+
+        .terminal-dot:nth-child(3) {
+            background: #27c93f;
+        }
+
+        .terminal-content {
+            font-family: 'Fira Code', monospace;
+            line-height: 1.5;
+        }
+
+        .terminal-content .prompt {
+            color: var(--secondary);
+        }
+
+        .terminal-content .command {
+            color: var(--light);
+        }
+
+        .terminal-content .output {
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <h1>Sabyasachi Patra</h1>
+            <p class="subtitle">Software Developer & Tech Enthusiast</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <a href="mailto:xyz6173@gmail.com">xyz6173@gmail.com</a>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <a href="tel:7978617446">7978617446</a>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-github"></i>
+                    <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-linkedin"></i>
+                    <a href="https://linkedin.com/in/yourusername" target="_blank">linkedin.com/in/yourusername</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="terminal-section">
+            <div class="terminal-header">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+            <div class="terminal-content">
+                <p><span class="prompt">$ </span><span class="command">whoami</span></p>
+                <p class="output">A passionate developer with expertise in building scalable applications and solving complex problems.</p>
+                <p><span class="prompt">$ </span><span class="command">ls ./skills</span></p>
+                <p class="output">TypeScript, JavaScript, Node.js, Express.js, REST APIs, JWT, Zod, React, Tailwind CSS, Recoil, PostgreSQL, MongoDB, Prisma, Prisma Accelerate, Azure, Docker, Amazon EC2, Amazon S3, Amazon RDS, Cloudflare Workers, Cloudflare Pages, KV Storage, Git, GitHub, Dotenv, Prisma Migrations, Postman, Monorepo</p>
+            </div>
+        </div>
+
+        <section id="skills">
+            <h2><i class="fas fa-code"></i> Skills</h2>
+            <div class="skills-container">
+                <!-- Skills will be dynamically inserted here -->
+                <!-- Example of how skills would render: -->
+                <div id="skills-placeholder"></div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2><i class="fas fa-laptop-code"></i> Projects</h2>
+            <div class="card-grid">
+                
+    <div>
+      <h3>TypeScript Todo - Express + TypeScript + Prisma + PostgreSQL</h3>
+      <p>Developed a backend API using Express.js, TypeScript, Prisma, and PostgreSQL to manage todos. Implemented authentication with JWT, ensuring secure user login and CRUD operations. Used TypeScript for static typing and enhanced maintainability. Incorporated Prisma ORM with PostgreSQL for robust, structured database management. Integrated Zod for advanced input validation. Used Dotenv for environment variable management. Enabled asynchronous database operations for a smoother and faster user experience.</p>
+      <p><strong>Tech:</strong> TypeScript, Express.js, Prisma, PostgreSQL, JWT, Zod, REST APIs, Dotenv</p>
+    </div>
+  
+    <div>
+      <h3>Cloudflare URL Shortener (Serverless Backend)</h3>
+      <p>Developed a serverless URL shortener using Cloudflare Workers. Built a POST endpoint for generating short URLs and used Cloudflare KV Storage for data storage. Implemented a redirection service for short URLs using Cloudflare’s edge network. Designed the solution as a stateless, serverless application for scalability. Handled errors like invalid URLs and missing shortcodes with appropriate error messages. Achieved instant global scalability using Cloudflare’s edge network. Leveraged Cloudflare KV for fast, distributed data retrieval. Utilized a cost-efficient serverless model. Deployed the project directly onto Cloudflare.</p>
+      <p><strong>Tech:</strong> Cloudflare Workers, Serverless Architecture, Cloudflare KV, HTTP, Routing, REST APIs</p>
+    </div>
+  
+            </div>
+        </section>
+
+        <section id="experience">
+            <h2><i class="fas fa-briefcase"></i> Experience</h2>
+            <div class="card-grid">
+                
+    <div>
+      <h3>Microsoft Azure Internship at Ingenious-Tech World</h3>
+      <p>July 2024 - August 2024</p>
+      <p>Worked as an intern, gaining hands-on experience with core Azure services like Virtual Machines, Storage, Databases, and more. Deployed applications on an autoscaling cloud architecture using Azure services. Utilized Azure tools such as resource groups, virtual machines, virtual networks, subnets, load balancers, application gateways, domain names, and DNS to optimize cloud infrastructure. Gained proficiency in the configuration and management of cloud environments, laying a strong foundation for cloud computing career opportunities.</p>
+    </div>
+  
+            </div>
+        </section>
+
+        <section id="education">
+            <h2><i class="fas fa-graduation-cap"></i> Education</h2>
+            <div class="card-grid">
+                
+    <div>
+      <h3>Bachelors of Technology in Computer Science - Silicon University</h3>
+      <p>Computer Science</p>
+      <p>Nov. 2022 - Current</p>
+    </div>
+  
+    <div>
+      <h3>Higher Secondary Education (Science) - St Mary’s School</h3>
+      <p>Science</p>
+      <p>Jun. 2019 - Aug. 2021</p>
+    </div>
+  
+    <div>
+      <h3>Secondary School Education - St Mary’s School</h3>
+      <p></p>
+      <p>Mar. 2018 - May 2019</p>
+    </div>
+  
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Sabyasachi Patra | Portfolio created with <span style="color: var(--primary);">❤</span></p>
+        </div>
+    </footer>
+
+    <script>
+        // Parse skills and create skill tags
+        document.addEventListener('DOMContentLoaded', function() {
+            const skillsText = "TypeScript, JavaScript, Node.js, Express.js, REST APIs, JWT, Zod, React, Tailwind CSS, Recoil, PostgreSQL, MongoDB, Prisma, Prisma Accelerate, Azure, Docker, Amazon EC2, Amazon S3, Amazon RDS, Cloudflare Workers, Cloudflare Pages, KV Storage, Git, GitHub, Dotenv, Prisma Migrations, Postman, Monorepo";
+            const skillsArray = skillsText.split(', ').filter(skill => skill.trim() !== '');
+            
+            const skillsContainer = document.getElementById('skills-placeholder');
+            const skillIcons = {
+                'JavaScript': 'fab fa-js',
+                'React': 'fab fa-react',
+                'Node.js': 'fab fa-node-js',
+                'Python': 'fab fa-python',
+                'HTML': 'fab fa-html5',
+                'CSS': 'fab fa-css3-alt',
+                'Java': 'fab fa-java',
+                'Git': 'fab fa-git-alt',
+                'Docker': 'fab fa-docker',
+                'AWS': 'fab fa-aws',
+                // Add more mappings as needed
+            };
+            
+            let skillsHTML = '';
+            skillsArray.forEach(skill => {
+                const icon = skillIcons[skill] || 'fas fa-code';
+                skillsHTML += `<div class="skill-tag"><i class="${icon}"></i>${skill}</div>`;
+            });
+            
+            skillsContainer.innerHTML = skillsHTML;
+        });
+    </script>
+</body>
+</html>

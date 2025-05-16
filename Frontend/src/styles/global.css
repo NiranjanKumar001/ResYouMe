@@ -35,3 +35,17 @@ body {
   background: #8aff8a;
   color: #000;
 }
+
+.hide-scrollbar {
+  /* For Firefox */
+  scrollbar-width: none;
+  /* For IE and Edge */
+  -ms-overflow-style: none;
+  /* Maintain scrolling functionality */
+  overflow: auto;
+}
+
+/* For Chrome, Safari, and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
