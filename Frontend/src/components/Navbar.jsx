@@ -170,7 +170,7 @@ const Navbar = () => {
                   onClick={githubLogin}
                   className="relative px-4 py-1 rounded-full bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium text-sm tracking-wide hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 shadow-lg z-10 border border-gray-600/50"
                 >
-                  Login with GitHub
+                  Get Started
                 </button>
               )}
             </div>

@@ -180,14 +180,16 @@ const PaymentSection = () => {
             </div>
 
             <div className="mb-6 w-full">
-              <div className="flex justify-center items-center mb-4">
-                <img
-                  src="./payment.jpeg"
-                  alt="payment"
-                  className="max-w-[200px] md:max-w-[300px] w-full h-auto object-contain rounded-lg border border-[#2A3042]"
-                />
+              <div className="relative w-full pb-[30%]"> {/* Aspect ratio container */}
+                <div className="absolute inset-0 flex items-center justify-center p-2">
+                  <img
+                    src="./payment.jpeg"
+                    alt="payment"
+                    className="max-w-[160px] md:max-w-[220px] w-full h-auto object-contain rounded-lg border border-[#2A3042] transform hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
               </div>
-              <p className="text-gray-300 text-sm text-center mb-4 leading-relaxed">
+              <p className="text-gray-300 text-sm text-center px-4 mb-4 leading-relaxed">
                 Enjoying our service? Buy us a biryani to support our work and keep the service free for everyone!
               </p>
             </div>
