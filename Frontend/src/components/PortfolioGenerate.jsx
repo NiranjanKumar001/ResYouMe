@@ -166,36 +166,48 @@ const PaymentSection = () => {
     <div className="container mx-auto p-4 bg-[#0F1524] text-white rounded-lg">
       {showBiryaniModal && (
         <div className="fixed inset-0 bg-gray-800 rounded-2xl bg-opacity-80 backdrop-blur-sm flex  z-50 p-4">
-          {/* <div className="bg-[#1A1F2E] rounded-xl p-6 max-w-md w-full border border-[#2A3042] shadow-xl"> */}
-            {/* <div className="flex justify-between items-center mb-6"> */}
-              <h3 className="text-xl font-bold text-white">Support Our Work</h3>
-              <button
-                onClick={() => setShowBiryaniModal(false)}
-                className="text-gray-400 hover:text-white transition-colors duration-200 rounded-full p-1 hover:bg-[#232836]"
+          <div className="relative w-full max-w-md mx-auto bg-[#1F1F2B] p-6 rounded-xl shadow-lg space-y-4">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowBiryaniModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200 rounded-full p-1 hover:bg-[#232836]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            {/* </div> */}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
 
+            {/* Heading */}
+            <h3 className="text-xl font-bold text-white text-center">Support Our Work</h3>
 
+            {/* QR Code Image */}
             <img
               src="./payment.jpeg"
               alt="payment"
-              className="max-w-[160px] md:max-w-[220px] w-full h-auto object-contain rounded-lg border border-[#2A3042] transform hover:scale-105 transition-transform duration-300"
+              className="w-full object-contain rounded-lg max-h-[300px] mx-auto"
             />
 
-
-            <div className="flex justify-between space-x-4">
+            {/* Skip Button */}
+            <div className="flex justify-center">
               <button
                 onClick={handleSkipBiryani}
-                className="mt-4 px-4 h-[2rem] text-center bg-gray-600  text-gray-300 rounded-lg flex-1 transition-all duration-300 border border-[#2A3042] font-medium hover:bg-red-400"
+                className="mt-2 px-4 py-2 text-center bg-gray-600 text-gray-300 rounded-lg transition-all duration-300 border border-[#2A3042] font-medium hover:bg-red-400 w-full max-w-[200px]"
               >
                 Skip for now
               </button>
             </div>
-          {/* </div> */}
+          </div>
         </div>
       )}
 
