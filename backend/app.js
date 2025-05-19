@@ -162,7 +162,7 @@ app.get('/auth/github/callback', async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
+      // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
     });
 
     res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
