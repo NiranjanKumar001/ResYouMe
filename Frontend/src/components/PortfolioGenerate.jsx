@@ -165,9 +165,9 @@ const PaymentSection = () => {
   return (
     <div className="container mx-auto p-4 bg-[#0F1524] text-white rounded-lg">
       {showBiryaniModal && (
-        <div className="fixed inset-0 bg-gray-800 rounded-2xl bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1A1F2E] rounded-xl p-6 max-w-md w-full border border-[#2A3042] shadow-xl">
-            <div className="flex justify-between items-center mb-6">
+        <div className="fixed inset-0 bg-gray-800 rounded-2xl bg-opacity-80 backdrop-blur-sm flex  z-50 p-4">
+          {/* <div className="bg-[#1A1F2E] rounded-xl p-6 max-w-md w-full border border-[#2A3042] shadow-xl"> */}
+            {/* <div className="flex justify-between items-center mb-6"> */}
               <h3 className="text-xl font-bold text-white">Support Our Work</h3>
               <button
                 onClick={() => setShowBiryaniModal(false)}
@@ -177,7 +177,7 @@ const PaymentSection = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-            </div>
+            {/* </div> */}
 
 
             <img
@@ -195,7 +195,7 @@ const PaymentSection = () => {
                 Skip for now
               </button>
             </div>
-          </div>
+          {/* </div> */}
         </div>
       )}
 
