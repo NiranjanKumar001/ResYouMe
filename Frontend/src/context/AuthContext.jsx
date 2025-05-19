@@ -13,8 +13,9 @@ const AuthContext = ({ children }) => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
         withCredentials: true,
-        validateStatus: (status) => status < 500
+        timeout: 8000
       });
+      console.log('Auth check response:', res.data);
       
       if (res.data.isAuthenticated) {
         setProtect(true);
@@ -22,6 +23,7 @@ const AuthContext = ({ children }) => {
       } else {
         setProtect(false);
         setUser(null);
+        Cookies.remove('auth_token');
       }
     } catch (error) {
       console.error('Auth check failed:', error);
@@ -31,6 +33,14 @@ const AuthContext = ({ children }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    checkAuthStatus();
+    
+    const handleRouteChange = () => checkAuthStatus();
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, []);
 
   const githubLogin = () => {
     window.location.href = `${import.meta.env.VITE_API_URL}/auth/github`;
@@ -49,12 +59,9 @@ const AuthContext = ({ children }) => {
       setProtect(false);
       setUser(null);
       Cookies.remove('auth_token');
+      window.location.reload();
     }
   };
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
 
   return (
     <UserContext.Provider value={{ 
