@@ -169,7 +169,7 @@ const PaymentSection = () => {
           <div className="bg-[#1A1F2E] rounded-xl p-6 max-w-md w-full border border-[#2A3042] shadow-xl">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-white">Support Our Work</h3>
-              <button 
+              <button
                 onClick={() => setShowBiryaniModal(false)}
                 className="text-gray-400 hover:text-white transition-colors duration-200 rounded-full p-1 hover:bg-[#232836]"
               >
@@ -178,18 +178,20 @@ const PaymentSection = () => {
                 </svg>
               </button>
             </div>
-            
-            <div className="mb-6 w-full h-[12rem]">
-              <img 
-                src="./payment.jpeg" 
-                alt="Biryani"
-                className="w-full h-[10rem] px-[7rem] object-fit rounded-lg mb-4 border border-[#2A3042]"
-              />
+
+            <div className="mb-6 w-full">
+              <div className="flex justify-center items-center mb-4">
+                <img
+                  src="./payment.jpeg"
+                  alt="payment"
+                  className="max-w-[200px] md:max-w-[300px] w-full h-auto object-contain rounded-lg border border-[#2A3042]"
+                />
+              </div>
               <p className="text-gray-300 text-sm text-center mb-4 leading-relaxed">
                 Enjoying our service? Buy us a biryani to support our work and keep the service free for everyone!
               </p>
             </div>
-            
+
             <div className="flex justify-between space-x-4">
               <button
                 onClick={handleSkipBiryani}
@@ -230,7 +232,7 @@ const PaymentSection = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             {templates.map((template) => {
-              // Check if template is "Coming Soon"
+
               const isComingSoon = template.description === "Coming Soon";
 
               return (
@@ -238,8 +240,8 @@ const PaymentSection = () => {
                   key={template.id}
                   onClick={() => resumeId && !isComingSoon && setSelectedTemplate(template.id)}
                   className={`bg-[#1A1F2E] rounded-xl overflow-hidden transition-all duration-300 ${selectedTemplate === template.id
-                      ? 'ring-2 ring-[#3B82F6] transform scale-[1.02]'
-                      : 'hover:bg-[#232836] border border-[#2A3042]'
+                    ? 'ring-2 ring-[#3B82F6] transform scale-[1.02]'
+                    : 'hover:bg-[#232836] border border-[#2A3042]'
                     } ${!resumeId || isComingSoon ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="p-4">
@@ -266,8 +268,8 @@ const PaymentSection = () => {
               onClick={handleDeploymentClick}
               disabled={isLoading || !selectedTemplate || !resumeId}
               className={`px-6 py-3 rounded-lg text-white font-medium text-lg transition-all duration-300 ${isLoading || !selectedTemplate || !resumeId
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : 'bg-[#3B82F6] hover:bg-blue-600 shadow-md hover:shadow-lg'
+                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                : 'bg-[#3B82F6] hover:bg-blue-600 shadow-md hover:shadow-lg'
                 } mb-6`}
             >
               {isLoading ? 'Deploying...' : 'Deploy Portfolio'}
@@ -318,8 +320,8 @@ const PaymentSection = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center">
                     <span className={`font-medium truncate ${step.status === 'in-progress' ? 'text-[#3B82F6]' :
-                        step.status === 'completed' ? 'text-green-400' :
-                          step.status === 'failed' ? 'text-red-400' : 'text-gray-200'
+                      step.status === 'completed' ? 'text-green-400' :
+                        step.status === 'failed' ? 'text-red-400' : 'text-gray-200'
                       }`}>{step.name}</span>
                     <span className="text-xs text-gray-400 ml-2 flex-shrink-0">{step.time}</span>
                   </div>
