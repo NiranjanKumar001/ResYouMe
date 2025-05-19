@@ -163,9 +163,9 @@ const PaymentSection = () => {
   ];
 
   return (
-    <div className="mx-auto p-4 bg-[#0F1524] text-white rounded-lg">
+    <div className="mx-auto h-[18rem] p-4 bg-[#0F1524] text-white rounded-lg">
       {showBiryaniModal && (
-        // <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-80 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-50 rounded-lg bg-gray-800 bg-opacity-80 backdrop-blur-sm flex items-center justify-center">
           <div className="relative w-full max-w-md bg-[#1F1F2B] p-6 rounded-xl shadow-lg space-y-4 mx-4">
             {/* Close Button */}
             <button
@@ -207,7 +207,7 @@ const PaymentSection = () => {
                 Skip for now
               </button>
             </div>
-          {/* </div> */}
+          </div>
         </div>
       )}
 
