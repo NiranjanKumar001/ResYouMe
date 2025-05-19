@@ -179,7 +179,7 @@ app.post('/api/auth/logout', (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
+    // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
   });
   res.json({ success: true, message: 'Logged out successfully' });
 });
