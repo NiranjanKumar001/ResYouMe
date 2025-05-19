@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/AuthContext';
+// import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -28,8 +30,10 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      setProtect(false); // Explicitly set protect to false on logout
+      setProtect(false);
+      Cookies.remove('auth_token');
       navigate('/');
+      window.location.reload(); // Ensure full state reset
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -42,7 +46,6 @@ const Navbar = () => {
     { to: '/contact', label: 'Contact' }
   ];
 
-  // Show loading state if needed
   if (loading) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-lg border-b border-gray-700/60">
@@ -78,6 +81,7 @@ const Navbar = () => {
               scrolled ? 'h-12 shadow-lg' : 'h-14 shadow-xl'
             } w-full md:w-auto`}
           >
+            {/* Brand Logo */}
             <div className="flex items-center group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
               <Link to="/" className="text-white font-medium text-xl tracking-tight relative z-10">
@@ -87,6 +91,7 @@ const Navbar = () => {
               </Link>
             </div>
 
+            {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 rounded-full focus:outline-none"
               onClick={toggleMobileMenu}
@@ -112,6 +117,7 @@ const Navbar = () => {
               </div>
             </button>
 
+            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-6">
               {navItems.map((item) => (
                 <div key={item.to} className="group relative">
@@ -128,6 +134,7 @@ const Navbar = () => {
               ))}
             </div>
 
+            {/* Auth Section */}
             <div className="hidden md:block group relative">
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-500/40 opacity-0 group-hover:opacity-80 blur-md transition-opacity duration-300"></div>
               {protect && user ? (
@@ -163,13 +170,14 @@ const Navbar = () => {
                   onClick={githubLogin}
                   className="relative px-4 py-1 rounded-full bg-gradient-to-r from-gray-800 to-gray-700 text-white font-medium text-sm tracking-wide hover:from-blue-500/70 hover:to-purple-600/70 transition-all duration-500 shadow-lg z-10 border border-gray-600/50"
                 >
-                  Get Started
+                  Login with GitHub
                 </button>
               )}
             </div>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''} md:hidden`}>
           <div className="bg-gradient-to-b from-gray-900/95 to-gray-800/95 backdrop-blur-lg rounded-2xl mx-4 mt-2 p-6 shadow-xl border border-gray-700/60">
             <div className="flex flex-col space-y-4">
@@ -217,7 +225,7 @@ const Navbar = () => {
                   onClick={githubLogin}
                   className="w-full mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/70 to-purple-600/70 text-white font-medium text-sm tracking-wide transition-all duration-500 shadow-lg border border-gray-600/50 text-center"
                 >
-                  Get Started
+                  Login with GitHub
                 </button>
               )}
             </div>
