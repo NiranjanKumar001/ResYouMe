@@ -10,7 +10,7 @@ const PaymentSection = () => {
   const [isDeploying, setIsDeploying] = useState(false);
   const [showBiryaniModal, setShowBiryaniModal] = useState(false);
   const [deploymentSteps, setDeploymentSteps] = useState([
-    { id: 1, name: 'Validating template', status: 'pending', time: '2-3s' },
+    { id: 1, name: 'Validating template', status: 'pending', time: '20-30s' },
     { id: 2, name: 'Building portfolio', status: 'pending', time: '10-15s' },
     { id: 3, name: 'Creating GitHub repository', status: 'pending', time: '5-8s' },
     { id: 4, name: 'Deploying to GitHub Pages', status: 'pending', time: '20-30s' }
@@ -70,7 +70,7 @@ const PaymentSection = () => {
     try {
       // Step 1: Validating template
       updateStepStatus(1, 'in-progress');
-      await new Promise(resolve => setTimeout(resolve, 9500)); 
+      await new Promise(resolve => setTimeout(resolve, 12500)); 
       updateStepStatus(1, 'completed');
 
       // Step 2: Building portfolio
@@ -100,7 +100,7 @@ const PaymentSection = () => {
 
       // Step 3: Creating GitHub repository
       updateStepStatus(3, 'in-progress');
-      await new Promise(resolve => setTimeout(resolve, 15000)); // Simulate repo creation time
+      await new Promise(resolve => setTimeout(resolve, 25000)); // Simulate repo creation time
       updateStepStatus(3, 'completed');
 
       // Step 4: Deploying to GitHub Pages

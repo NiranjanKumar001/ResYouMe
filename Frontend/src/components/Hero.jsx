@@ -33,9 +33,9 @@ const FloatingShape = ({ type, size, position, rotation, delay, color }) => {
       case 'triangle':
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <polygon 
-              points="50,10 90,90 10,90" 
-              fill="currentColor" 
+            <polygon
+              points="50,10 90,90 10,90"
+              fill="currentColor"
               stroke="currentColor"
               strokeWidth="2"
             />
@@ -44,11 +44,11 @@ const FloatingShape = ({ type, size, position, rotation, delay, color }) => {
       case 'circle':
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle 
-              cx="50" 
-              cy="50" 
-              r="45" 
-              fill="currentColor" 
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="currentColor"
               stroke="currentColor"
               strokeWidth="2"
             />
@@ -57,12 +57,12 @@ const FloatingShape = ({ type, size, position, rotation, delay, color }) => {
       case 'square':
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <rect 
-              x="10" 
-              y="10" 
-              width="80" 
-              height="80" 
-              fill="currentColor" 
+            <rect
+              x="10"
+              y="10"
+              width="80"
+              height="80"
+              fill="currentColor"
               stroke="currentColor"
               strokeWidth="2"
             />
@@ -71,9 +71,9 @@ const FloatingShape = ({ type, size, position, rotation, delay, color }) => {
       case 'hexagon':
         return (
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <polygon 
-              points="50,5 90,25 90,75 50,95 10,75 10,25" 
-              fill="currentColor" 
+            <polygon
+              points="50,5 90,25 90,75 50,95 10,75 10,25"
+              fill="currentColor"
               stroke="currentColor"
               strokeWidth="2"
             />
@@ -234,7 +234,7 @@ const Hero = () => {
         ))}
 
         {/* Dynamic gradient that follows mouse */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{
             backgroundPosition: `${50 + mousePosition.x * 10}% ${50 + mousePosition.y * 10}%`
@@ -249,18 +249,18 @@ const Hero = () => {
         <div className="absolute inset-0 h-full w-full z-[-1]">
           <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:linear-gradient(to_bottom,transparent_10%,#000_40%)]"></div>
         </div>
-        
+
         {/* Centered gradient blur */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <div className="w-[600px] h-[600px] bg-gradient-to-br from-blue-400/30 to-purple-500/40 rounded-full filter blur-[120px]"></div>
         </div>
-        
+
         {/* Floating gradient bubbles */}
         <div className="absolute -bottom-40 left-0 right-0 h-[500px] pointer-events-none z-0">
           <div className="absolute left-[30%] bottom-20 w-[300px] h-[300px] bg-blue-500/15 rounded-full filter blur-[90px]"></div>
           <div className="absolute left-[70%] bottom-10 w-[250px] h-[250px] bg-purple-500/20 rounded-full filter blur-[80px]"></div>
         </div>
-        
+
         {/* Grid background at the top */}
         <div className="absolute inset-0 h-[50vh] pointer-events-none z-[-1]">
           <div className="relative h-full w-full bg-white">
@@ -281,7 +281,7 @@ const Hero = () => {
               AI Compute for Everyone
             </span>
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -320,11 +320,11 @@ const Hero = () => {
 
           {/* Scroll to Explore - Only visible when hero is in view */}
           {isHeroVisible && (
-            <motion.div 
-              className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30"
+            <motion.div
+              className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30 hidden sm:block"
               initial={{ opacity: 0, y: 20 }}
-              animate={{ 
-                opacity: 1, 
+              animate={{
+                opacity: 1,
                 y: 0,
                 transition: { delay: 1, duration: 0.8 }
               }}
@@ -358,6 +358,7 @@ const Hero = () => {
               </div>
             </motion.div>
           )}
+
         </div>
       </section>
 
