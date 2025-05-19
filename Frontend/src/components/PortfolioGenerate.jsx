@@ -70,7 +70,7 @@ const PaymentSection = () => {
     try {
       // Step 1: Validating template
       updateStepStatus(1, 'in-progress');
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate validation time
+      await new Promise(resolve => setTimeout(resolve, 9500)); 
       updateStepStatus(1, 'completed');
 
       // Step 2: Building portfolio
@@ -100,7 +100,7 @@ const PaymentSection = () => {
 
       // Step 3: Creating GitHub repository
       updateStepStatus(3, 'in-progress');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate repo creation time
+      await new Promise(resolve => setTimeout(resolve, 15000)); // Simulate repo creation time
       updateStepStatus(3, 'completed');
 
       // Step 4: Deploying to GitHub Pages
