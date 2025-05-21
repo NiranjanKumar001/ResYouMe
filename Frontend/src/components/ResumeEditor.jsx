@@ -450,7 +450,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
 
       // Remove undefined values to prevent schema validation errors
       const cleanData = JSON.parse(JSON.stringify(requestData));
-      console.log("Sending data to server:", cleanData);
 
       const response = await axios.patch(
         `${API_BASE_URL}/api/resumes/${resumeId}`,
@@ -464,7 +463,6 @@ const ResumeEditor = ({ initialData, onComplete, onBack }) => {
         }
       );
 
-      console.log('Resume updated successfully:', response.data);
       onComplete(response.data);
     } catch (error) {
       console.error('Error details:', {

@@ -41,7 +41,6 @@ const ResumeUpload = ({ onComplete }) => {
       const formData = new FormData();
       formData.append('resume', file);
 
-      console.log('Starting upload for:', file.name);
 
       // Get authentication token from cookies
       const authToken = Cookies.get('authToken');
@@ -67,7 +66,6 @@ const ResumeUpload = ({ onComplete }) => {
         }
       );
 
-      console.log('Upload successful! Response:', response.data);
       
       // Store resumeId for later use
       if (response.data.resume && response.data.resume.id) {
