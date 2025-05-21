@@ -132,7 +132,6 @@ function Dashboard() {
           data,
           { withCredentials: true }
         );
-        console.log('Resume data updated successfully');
       }
     } catch (error) {
       console.error('Failed to update resume data:', error);

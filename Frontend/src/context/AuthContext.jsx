@@ -16,7 +16,6 @@ const AuthContext = ({ children }) => {
         withCredentials: true,
         timeout: 8000
       });
-      console.log('Auth check response:', res.data);
       
       if (res.data.isAuthenticated) {
         setProtect(true);

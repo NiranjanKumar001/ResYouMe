@@ -52,7 +52,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 app.get('/api/auth/status', async (req, res) => {
   try {
     const token = req.cookies.auth_token;
-    console.log("Token:", token);
     if (!token) {
       return res.json({ isAuthenticated: false });
     }
