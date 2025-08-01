@@ -7,7 +7,7 @@ Built with **React**, **Express**, **MongoDB**, and **Ollama LLM**.
 
 - 🧾 Upload Resume (PDF/DOCX/Text)
 - 🔒 Login via GitHub OAuth
-- 🤖 AI-generated portfolio (using local LLM with Ollama)
+- 🤖 AI-generated portfolio 
 - ⬆️ One-click GitHub repo deployment
 - 💸 Optional payment integration for monetization
 - 🌐 Live preview of generated site
@@ -21,7 +21,6 @@ Built with **React**, **Express**, **MongoDB**, and **Ollama LLM**.
 | Frontend  | React + Vite + Tailwind CSS      |
 | Backend   | Node.js + Express.js             |
 | Auth      | GitHub OAuth + JWT               |
-| AI Engine | Ollama (running LLaMA3 locally)  |
 | Database  | MongoDB                          |
 | Hosting   | Render/Vercel/Netlify (Frontend) |
 |           | Railway/Render (Backend)         |
