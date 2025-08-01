@@ -5,11 +5,10 @@ Built with **React**, **Express**, **MongoDB**, and **Ollama LLM**.
 
 ## 🚀 Features
 
-- 🧾 Upload Resume (PDF/DOCX/Text)
+- 🧾 Upload Resume (PDF/DOCX)
 - 🔒 Login via GitHub OAuth
 - 🤖 AI-generated portfolio 
 - ⬆️ One-click GitHub repo deployment
-- 💸 Optional payment integration for monetization
 - 🌐 Live preview of generated site
 
 ---
@@ -23,6 +22,5 @@ Built with **React**, **Express**, **MongoDB**, and **Ollama LLM**.
 | Auth      | GitHub OAuth + JWT               |
 | Database  | MongoDB                          |
 | Hosting   | Render/Vercel/Netlify (Frontend) |
-|           | Railway/Render (Backend)         |
 
 ---
