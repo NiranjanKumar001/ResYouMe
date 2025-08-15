@@ -53,7 +53,6 @@
 - ⬆️ **One‑click GitHub repo** deployment (create repo, commit generated site, push).
 - 🌐 **Live preview** with theme switch, sections on/off, and instant edits.
 - 🗂️ **Templates**: multiple portfolio presets (cards, timeline, minimal).
-- ⚙️ **Config file** (`portfolio.config.json`) for easy overrides.
 
 ---
 
