@@ -8,7 +8,6 @@ const PaymentSection = () => {
   const [resumeId, setResumeId] = useState(null);
   const [deploymentResult, setDeploymentResult] = useState(null);
   const [isDeploying, setIsDeploying] = useState(false);
-  const [showBiryaniModal, setShowBiryaniModal] = useState(false);
   const [deploymentSteps, setDeploymentSteps] = useState([
     { id: 1, name: 'Validating template', status: 'pending', time: '20-30s' },
     { id: 2, name: 'Building portfolio', status: 'pending', time: '10-15s' },
@@ -39,15 +38,6 @@ const PaymentSection = () => {
     setDeploymentSteps(steps =>
       steps.map(step => ({ ...step, status: 'pending' }))
     );
-  };
-
-  const handleDeploymentClick = () => {
-    setShowBiryaniModal(true);
-  };
-
-  const handleSkipBiryani = () => {
-    setShowBiryaniModal(false);
-    startDeployment();
   };
 
   const startDeployment = async () => {
@@ -164,54 +154,6 @@ const PaymentSection = () => {
 
   return (
     <div className="mx-auto p-4 bg-[#0F1524] text-white rounded-lg">
-      {showBiryaniModal && (
-        <div className="fixed inset-0 z-50 rounded-lg bg-gray-800 bg-opacity-80 backdrop-blur-sm flex items-center justify-center">
-          <div className="relative w-full max-w-md bg-[#1F1F2B] p-6 rounded-xl shadow-lg space-y-4 mx-4">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowBiryaniModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200 rounded-full p-1 hover:bg-[#232836]"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Heading */}
-            <h3 className="text-xl font-bold text-white text-center">Support Our Work</h3>
-
-            {/* QR Code Image */}
-            <img
-              src="./payment.jpeg"
-              alt="payment"
-              className="w-full object-contain rounded-lg max-h-[300px] mx-auto"
-            />
-
-            {/* Skip Button */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleSkipBiryani}
-                className="mt-2 px-4 py-2 text-center bg-gray-600 text-gray-300 rounded-lg transition-all duration-300 border border-[#2A3042] font-medium hover:bg-red-400 w-full max-w-[200px]"
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
       {
         !isDeploying ? (
           <>
@@ -274,7 +216,7 @@ const PaymentSection = () => {
 
             <div className="flex justify-center">
               <button
-                onClick={handleDeploymentClick}
+                onClick={startDeployment}
                 disabled={isLoading || !selectedTemplate || !resumeId}
                 className={`px-6 py-3 rounded-lg text-white font-medium text-lg transition-all duration-300 ${isLoading || !selectedTemplate || !resumeId
                   ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
